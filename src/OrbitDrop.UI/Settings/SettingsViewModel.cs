@@ -2,6 +2,7 @@ using System.Windows;
 using OrbitDrop.Core;
 using OrbitDrop.Infrastructure;
 using OrbitDrop.UI.Common;
+using OrbitDrop.UI.Localization;
 
 namespace OrbitDrop.UI.Settings;
 
@@ -93,28 +94,28 @@ public sealed class SettingsViewModel : ObservableObject
     public bool TriggerCtrl { get => S.TriggerKey == TriggerKey.Ctrl; set { if (value) SetTrigger(TriggerKey.Ctrl); } }
     public string TriggerName => S.TriggerKey == TriggerKey.Ctrl ? "Ctrl" : "Shift";
     public bool KeyboardShortcut { get => S.KeyboardShortcut; set => Set(s => s.KeyboardShortcut = value, nameof(KeyboardShortcut), nameof(KeyboardShortcutHint), nameof(UseClipboardHint)); }
-    public string KeyboardShortcutHint => _host.KeyboardShortcutAvailable
+    public string KeyboardShortcutHint => UiText.T(_host.KeyboardShortcutAvailable
         ? "Select files in File Explorer, on the desktop or in VS Code, press it, then click an option. Click the centre (or press it again) for Tools and Actions."
-        : "Another app is using this shortcut, so OrbitDrop couldn't claim it.";
+        : "Another app is using this shortcut, so OrbitDrop couldn't claim it.");
     public bool UseClipboard { get => S.UseClipboard; set => Set(s => s.UseClipboard = value, nameof(UseClipboard)); }
-    public string UseClipboardHint => S.KeyboardShortcut
+    public string UseClipboardHint => UiText.T(S.KeyboardShortcut
         ? "With nothing selected, Ctrl + Alt + Space opens the wheel for what you copied: files, or an image such as a screenshot. Copied images are saved to the folder you're in, or Pictures."
-        : "Needs Ctrl + Alt + Space (above), which is off.";
+        : "Needs Ctrl + Alt + Space (above), which is off.");
     public bool ContextMenu { get => S.ContextMenu; set => Set(s => s.ContextMenu = value, nameof(ContextMenu)); }
-    public string ContextMenuHint => OrbitDrop.Windows.Shell.AppPackage.IsPackaged
+    public string ContextMenuHint => UiText.T(OrbitDrop.Windows.Shell.AppPackage.IsPackaged
         ? "Right-click files or folders in File Explorer and choose OrbitDrop to open the wheel for them."
-        : "Right-click files or folders in File Explorer and choose OrbitDrop (on Windows 11, under “Show more options”).";
+        : "Right-click files or folders in File Explorer and choose OrbitDrop (on Windows 11, under “Show more options”).");
     public bool LastUsedFirst { get => S.LastUsedFirst; set => Set(s => s.LastUsedFirst = value, nameof(LastUsedFirst)); }
     public bool ShowSizeEstimates { get => S.ShowSizeEstimates; set => Set(s => s.ShowSizeEstimates = value, nameof(ShowSizeEstimates)); }
     public bool OfferUndo { get => S.OfferUndo; set => Set(s => s.OfferUndo = value, nameof(OfferUndo)); }
     public bool KeepOpenOnCentre { get => S.KeepOpenOnCentre; set => Set(s => s.KeepOpenOnCentre = value, nameof(KeepOpenOnCentre), nameof(CentreReleaseHint)); }
-    public string CentreReleaseHint => S.KeepOpenOnCentre ? "Keep the wheel open: click an option, or outside to close" : "Cancel without doing anything";
+    public string CentreReleaseHint => UiText.T(S.KeepOpenOnCentre ? "Keep the wheel open: click an option, or outside to close" : "Cancel without doing anything");
     private void SetTrigger(TriggerKey k) => Set(s => s.TriggerKey = k, nameof(TriggerShift), nameof(TriggerCtrl), nameof(TriggerName));
 
     // ---- Conversions
     public bool OutputBeside { get => S.OutputLocation == OutputLocation.BesideOriginal; set { if (value) Set(s => s.OutputLocation = OutputLocation.BesideOriginal, nameof(OutputBeside), nameof(OutputToFolder)); } }
     public bool OutputToFolder { get => S.OutputLocation == OutputLocation.Folder; set { if (value && S.OutputFolder is not null) Set(s => s.OutputLocation = OutputLocation.Folder, nameof(OutputBeside), nameof(OutputToFolder)); } }
-    public string OutputFolderText => S.OutputFolder ?? "No folder chosen";
+    public string OutputFolderText => S.OutputFolder ?? UiText.T("No folder chosen");
     public bool HasOutputFolder => S.OutputFolder is not null;
 
     public void ChooseOutputFolder(string folder) =>
@@ -128,7 +129,7 @@ public sealed class SettingsViewModel : ObservableObject
     private void SetQuality(int q) => Set(s => s.JpegQuality = q, nameof(Quality75), nameof(Quality85), nameof(Quality92), nameof(Quality100));
 
     public IReadOnlyList<CapabilityRow> Capabilities =>
-        _host.Capabilities.Select(c => new CapabilityRow(c.Category, c.Detail)).ToList();
+        _host.Capabilities.Select(c => new CapabilityRow(UiText.T(c.Category), UiText.T(c.Detail))).ToList();
 
     // ---- Advanced
     public bool ExtendedDragDetection { get => S.ExtendedDragDetection; set => Set(s => s.ExtendedDragDetection = value, nameof(ExtendedDragDetection)); }
@@ -159,12 +160,14 @@ public sealed class SettingsViewModel : ObservableObject
     public int HiddenCount => S.HiddenOptions.Length;
 
     // ---- About
-    public string VersionText => _host.VersionText;
+    public string VersionText => _host.VersionText.StartsWith("Version ", StringComparison.Ordinal)
+        ? UiText.Format("Version {0}", _host.VersionText["Version ".Length..])
+        : UiText.T(_host.VersionText);
     public Visibility UpdateSwitchesVisibility => _host.StoreManagedUpdates ? Visibility.Collapsed : Visibility.Visible;
     public bool CheckForUpdates { get => S.CheckForUpdates; set => Set(s => s.CheckForUpdates = value, nameof(CheckForUpdates)); }
     public bool AutoInstallUpdates { get => S.AutoInstallUpdates; set => Set(s => s.AutoInstallUpdates = value, nameof(AutoInstallUpdates)); }
-    public string UpdateStatusText => _host.UpdateStatusText;
-    public string UpdateButtonText => _host.UpdateButtonText;
+    public string UpdateStatusText => UiText.T(_host.UpdateStatusText);
+    public string UpdateButtonText => UiText.T(_host.UpdateButtonText);
     public bool UpdateButtonEnabled => !_host.UpdateBusy;
     public RelayCommand UpdateCommand { get; }
 
@@ -177,8 +180,8 @@ public sealed class SettingsViewModel : ObservableObject
     }
 
     public RelayCommand RateCommand { get; }
-    public string RateButtonText => _host.RateButtonText;
-    public string RateHint => _host.RateHint;
+    public string RateButtonText => UiText.T(_host.RateButtonText);
+    public string RateHint => UiText.T(_host.RateHint);
     public RelayCommand PreviewWheelCommand { get; }
     public RelayCommand ShowOnboardingCommand { get; }
     public RelayCommand OpenLogsCommand { get; }

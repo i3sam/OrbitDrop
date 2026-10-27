@@ -3,7 +3,8 @@
   restyles open windows instantly. Spacing follows the 4 px grid; radii: controls 4, cards 6, surfaces 8.
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:loc="clr-namespace:OrbitDrop.UI.Localization">
 
     <FontFamily x:Key="Orbit.Font.Text">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="Orbit.Font.Display">Segoe UI Variable Display, Segoe UI</FontFamily>
@@ -162,7 +163,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
                     <StackPanel Orientation="Horizontal" Background="Transparent">
-                        <TextBlock x:Name="State" Text="Off" Margin="0,0,10,0" VerticalAlignment="Center"
+                        <TextBlock x:Name="State" Text="{loc:Localized Off}" Margin="0,0,10,0" VerticalAlignment="Center"
                                    Style="{StaticResource Orbit.Text.Body}" Foreground="{DynamicResource Orbit.TextSecondary}" />
                         <Grid Width="40" Height="20">
                             <Border x:Name="Track" CornerRadius="10" BorderThickness="1"
@@ -180,7 +181,7 @@
                             <Setter TargetName="Track" Property="Background" Value="{DynamicResource Orbit.Accent}" />
                             <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Orbit.Accent}" />
                             <Setter TargetName="Knob" Property="Fill" Value="{DynamicResource Orbit.OnAccent}" />
-                            <Setter TargetName="State" Property="Text" Value="On" />
+                            <Setter TargetName="State" Property="Text" Value="{loc:Localized On}" />
                             <Trigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>

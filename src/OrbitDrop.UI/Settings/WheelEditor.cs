@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using OrbitDrop.UI.Wheel;
+using OrbitDrop.UI.Localization;
 using static OrbitDrop.UI.Wheel.WheelGeometry;
 
 namespace OrbitDrop.UI.Settings;
@@ -185,7 +186,7 @@ public sealed class WheelEditor : FrameworkElement
             var at = new Point(c.X + LabelR * Math.Cos(a), c.Y + LabelR * Math.Sin(a));
             byte alpha = hidden ? (byte)0x70 : (byte)0xFF;
             var ink = new SolidColorBrush(Color.FromArgb(alpha, text.R, text.G, text.B));
-            var label = Text(entry.Choice.Label, display, n > 6 ? 10.5 : 11.5, FontWeights.SemiBold, ink, 74);
+            var label = Text(UiText.T(entry.Choice.Label), display, n > 6 ? 10.5 : 11.5, FontWeights.SemiBold, ink, 74);
             var glyph = entry.Choice.Glyph is { } g ? Text(hidden ? "" : g, icons, 17, FontWeights.Normal, ink, 40) : hidden ? Text("", icons, 15, FontWeights.Normal, ink, 40) : null;
             double total = label.Height + (glyph is null ? 0 : glyph.Height + 2);
             double y = at.Y - total / 2;
@@ -199,8 +200,8 @@ public sealed class WheelEditor : FrameworkElement
         dc.DrawEllipse(new SolidColorBrush(ThemeManager.Token("WheelHub")), new Pen(new SolidColorBrush(Color.FromArgb(0x22, text.R, text.G, text.B)), 1), c, HubR, HubR);
         int shown = _entries.Count(e => !_hidden.Contains(e.Choice.Key));
         var ink2 = new SolidColorBrush(text);
-        var big = Text(n == 0 ? "—" : $"{shown} of {n}", display, 17, FontWeights.SemiBold, ink2, 100);
-        var small = Text(dragging ? "Drop to place it" : _hover >= 0 && _hover < n ? (_hidden.Contains(_entries[_hover].Choice.Key) ? "Click to show · drag to move" : "Click to hide · drag to move") : "on the wheel",
+        var big = Text(n == 0 ? "—" : UiText.Format("{0} of {1}", shown, n), display, 17, FontWeights.SemiBold, ink2, 100);
+        var small = Text(UiText.T(dragging ? "Drop to place it" : _hover >= 0 && _hover < n ? (_hidden.Contains(_entries[_hover].Choice.Key) ? "Click to show · drag to move" : "Click to hide · drag to move") : "on the wheel"),
             display, 10, FontWeights.Normal, new SolidColorBrush(Color.FromArgb(0xA0, text.R, text.G, text.B)), 100);
         dc.DrawText(big, new Point(c.X - 50, c.Y - big.Height / 2 - 6));
         dc.DrawText(small, new Point(c.X - 50, c.Y + big.Height / 2 - 4));
@@ -210,7 +211,7 @@ public sealed class WheelEditor : FrameworkElement
         // The slice being moved, as a label under the pointer.
         if (dragging)
         {
-            var label = Text(_entries[_press].Choice.Label, display, 12, FontWeights.SemiBold, new SolidColorBrush(ThemeManager.Token("OnAccent")), 160);
+            var label = Text(UiText.T(_entries[_press].Choice.Label), display, 12, FontWeights.SemiBold, new SolidColorBrush(ThemeManager.Token("OnAccent")), 160);
             label.TextAlignment = TextAlignment.Left;
             var box = new Rect(_pointer.X + 12, _pointer.Y + 14, label.Width + 20, label.Height + 10);
             dc.DrawRoundedRectangle(new SolidColorBrush(accent), null, box, box.Height / 2, box.Height / 2);

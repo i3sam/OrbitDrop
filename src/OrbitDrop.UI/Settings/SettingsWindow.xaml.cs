@@ -4,6 +4,7 @@ using System.Windows.Controls.Primitives;
 using OrbitDrop.Core;
 using System.Windows.Media;
 using Microsoft.Win32;
+using OrbitDrop.UI.Localization;
 
 namespace OrbitDrop.UI.Settings;
 
@@ -18,6 +19,7 @@ public partial class SettingsWindow : Window
         DataContext = vm;
         Nav.SelectedIndex = 0;
         BuildActions();
+        UiText.Apply(this);
         ThemeManager.Current.Changed += OnThemeChanged;
         Closed += (_, _) => ThemeManager.Current.Changed -= OnThemeChanged;
     }
@@ -64,7 +66,7 @@ public partial class SettingsWindow : Window
         foreach (var category in _catalog)
         {
             var kind = category;
-            var button = new RadioButton { Style = (Style)FindResource("Orbit.Segment"), GroupName = "WheelKind", Content = kind.Title };
+            var button = new RadioButton { Style = (Style)FindResource("Orbit.Segment"), GroupName = "WheelKind", Content = UiText.T(kind.Title) };
             button.Checked += (_, _) => { _kind = kind; BuildModePicker(); };
             KindPicker.Children.Add(button);
         }
@@ -90,7 +92,7 @@ public partial class SettingsWindow : Window
         foreach (var section in _kind.Modes)
         {
             var mode = section.Mode;
-            var button = new RadioButton { Style = (Style)FindResource("Orbit.Segment"), GroupName = "WheelMode", Content = mode.ToString(), IsChecked = mode == _mode };
+            var button = new RadioButton { Style = (Style)FindResource("Orbit.Segment"), GroupName = "WheelMode", Content = UiText.T(mode.ToString()), IsChecked = mode == _mode };
             button.Checked += (_, _) => { _mode = mode; ShowEditor(); };
             ModePicker.Children.Add(button);
         }
@@ -131,13 +133,13 @@ public partial class SettingsWindow : Window
 
     private void OnChooseFolder(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFolderDialog { Title = "Choose where OrbitDrop saves new files" };
+        var dialog = new OpenFolderDialog { Title = UiText.T("Choose where OrbitDrop saves new files") };
         if (dialog.ShowDialog(this) == true) _vm.ChooseOutputFolder(dialog.FolderName);
     }
 
     private void OnReset(object sender, RoutedEventArgs e)
     {
-        var answer = MessageBox.Show(this, "Restore all OrbitDrop settings to their defaults?", "Reset settings",
+        var answer = MessageBox.Show(this, UiText.T("Restore all OrbitDrop settings to their defaults?"), UiText.T("Reset settings"),
             MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
         if (answer == MessageBoxResult.OK) _vm.ResetCommand.Execute(null);
     }

@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets\**\*" />
+    <EmbeddedResource Include="Localization\zh-Hant.json" LogicalName="OrbitDrop.UI.Localization.zh-Hant.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../OrbitDrop.Core/OrbitDrop.Core.csproj" />

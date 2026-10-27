@@ -12,6 +12,7 @@ using OrbitDrop.Jobs;
 using OrbitDrop.Tools;
 using OrbitDrop.Tools.Metadata;
 using OrbitDrop.UI;
+using OrbitDrop.UI.Localization;
 using OrbitDrop.UI.Onboarding;
 using OrbitDrop.UI.Settings;
 using OrbitDrop.UI.Toasts;
@@ -52,6 +53,7 @@ public partial class App : Application, ISettingsHost, ITrayCommands
         string[] args = e.Args;
 
         ThemeManager.Current.Initialize(this);
+        UiText.Initialize();
 
         // Design-review renders run alongside a live instance and never touch settings or the screen.
         int film = Array.IndexOf(args, "--render-film");
@@ -337,7 +339,7 @@ public partial class App : Application, ISettingsHost, ITrayCommands
     public IEnumerable<(string Category, string Detail)> Capabilities => _registry.Providers.SelectMany(p => p.DescribeCapabilities());
 
     public string VersionText =>
-        $"Version {Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "dev"}";
+        UiText.Format("Version {0}", Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "dev");
 
     public string SettingsPath => _paths.SettingsFile;
     public string LogsPath => _paths.LogsDirectory;
@@ -382,25 +384,25 @@ public partial class App : Application, ISettingsHost, ITrayCommands
     {
         get
         {
-            if (AppPackage.IsPackaged) return $"You have version {UpdateManager.Current}. The Microsoft Store keeps OrbitDrop up to date.";
+            if (AppPackage.IsPackaged) return UiText.Format("You have version {0}. The Microsoft Store keeps OrbitDrop up to date.", UpdateManager.Current);
             if (_updates is null) return "";
-            string last = _settings.LastUpdateCheck is { } t ? $" · checked {Ago(t)}" : "";
+            string last = _settings.LastUpdateCheck is { } t ? UiText.Format(" · checked {0}", Ago(t)) : "";
             return _updates.State switch
             {
-                UpdateState.Checking => "Checking GitHub for a newer version…",
+                UpdateState.Checking => UiText.T("Checking GitHub for a newer version…"),
                 UpdateState.Ready when _updates.Available is { } r =>
-                    $"OrbitDrop {r.Version} is downloaded and installs by itself the next time you're not using OrbitDrop.",
+                    UiText.Format("OrbitDrop {0} is downloaded and installs by itself the next time you're not using OrbitDrop.", r.Version),
                 UpdateState.Available or UpdateState.Downloading or UpdateState.Installing when _updates.Available is { } r =>
-                    UpdateManager.IsInstalled ? $"OrbitDrop {r.Version} is available. Installing takes a few seconds and keeps your settings."
-                                              : $"OrbitDrop {r.Version} is available. This is the portable copy, so download it from GitHub.",
+                    UpdateManager.IsInstalled ? UiText.Format("OrbitDrop {0} is available. Installing takes a few seconds and keeps your settings.", r.Version)
+                                              : UiText.Format("OrbitDrop {0} is available. This is the portable copy, so download it from GitHub.", r.Version),
                 UpdateState.Failed => $"{_updates.Error}{last}",
-                _ when _settings.LastUpdateCheck is null => $"You have version {UpdateManager.Current}. Not checked yet.",
-                _ => $"You're up to date (version {UpdateManager.Current}){last}",
+                _ when _settings.LastUpdateCheck is null => UiText.Format("You have version {0}. Not checked yet.", UpdateManager.Current),
+                _ => UiText.Format("You're up to date (version {0}){1}", UpdateManager.Current, last),
             };
         }
     }
 
-    public string UpdateButtonText => AppPackage.IsPackaged ? "Open Store" : _updates?.State switch
+    public string UpdateButtonText => UiText.T(AppPackage.IsPackaged ? "Open Store" : _updates?.State switch
     {
         UpdateState.Checking => "Checking…",
         UpdateState.Downloading => "Downloading…",
@@ -408,7 +410,7 @@ public partial class App : Application, ISettingsHost, ITrayCommands
         UpdateState.Available => UpdateManager.IsInstalled ? "Install update" : "Download",
         UpdateState.Ready => "Install now",
         _ => "Check now",
-    };
+    });
 
     public bool UpdateBusy => _updates?.State is UpdateState.Checking or UpdateState.Downloading or UpdateState.Installing;
 
@@ -449,9 +451,9 @@ public partial class App : Application, ISettingsHost, ITrayCommands
     private static string Ago(DateTimeOffset t)
     {
         var d = DateTimeOffset.UtcNow - t;
-        if (d < TimeSpan.FromMinutes(1)) return "just now";
-        if (d < TimeSpan.FromHours(1)) return $"{(int)d.TotalMinutes} min ago";
-        if (d < TimeSpan.FromDays(1)) return $"{(int)d.TotalHours} h ago";
+        if (d < TimeSpan.FromMinutes(1)) return UiText.T("just now");
+        if (d < TimeSpan.FromHours(1)) return UiText.Format("{0} min ago", (int)d.TotalMinutes);
+        if (d < TimeSpan.FromDays(1)) return UiText.Format("{0} h ago", (int)d.TotalHours);
         return t.ToLocalTime().ToString("d MMM");
     }
 

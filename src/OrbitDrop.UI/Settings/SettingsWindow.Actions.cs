@@ -3,6 +3,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using Microsoft.Win32;
 using OrbitDrop.Core;
+using OrbitDrop.UI.Localization;
 
 namespace OrbitDrop.UI.Settings;
 
@@ -32,8 +33,8 @@ public partial class SettingsWindow
         for (int i = 0; i < _actions.Count; i++) ActionsHost.Children.Add(ActionCard(i));
         int free = CustomAction.FreeActions;
         ActionsUsage.Text = _vm.Licensed
-            ? $"{_actions.Count} of {CustomAction.MaxActions} · unlimited with your upgrade"
-            : $"{Math.Min(_actions.Count, free)} of {free} free actions used · more with the upgrade \U0001F451";
+            ? UiText.Format("{0} of {1} · unlimited with your upgrade", _actions.Count, CustomAction.MaxActions)
+            : UiText.Format("{0} of {1} free actions used · more with the upgrade 👑", Math.Min(_actions.Count, free), free);
         AddActionButton.IsEnabled = _actions.Count < CustomAction.MaxActions;
         // Nothing yet: show the apps straight away, so the first action is one click.
         if (_actions.Count == 0) ShowPicker();
@@ -63,11 +64,11 @@ public partial class SettingsWindow
         ActionPicker.Visibility = Visibility.Visible;
         if (ActionPickerApps.Children.Count > 0) return;
         foreach (var app in AppCatalog.Installed)
-            ActionPickerApps.Children.Add(PickerTile(AppCatalog.IconOf(app.Program), "\uE7AC", app.Name, $"Opens {KindPhrase(app.Kind, app.Extensions)} in {app.Name}",
+            ActionPickerApps.Children.Add(PickerTile(AppCatalog.IconOf(app.Program), "\uE7AC", app.Name, UiText.Format("Opens {0} in {1}", KindPhrase(app.Kind, app.Extensions), app.Name),
                 () => AddAction(app.ToAction(), advanced: false)));
         ActionPickerApps.Children.Add(PickerTile(null, "\uE8E5", "Another app…", "Choose any program on your PC", () =>
         {
-            var dialog = new OpenFileDialog { Title = "Which app should open your files?", Filter = "Programs (*.exe)|*.exe",
+            var dialog = new OpenFileDialog { Title = UiText.T("Which app should open your files?"), Filter = "Programs (*.exe)|*.exe",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) };
             if (dialog.ShowDialog(this) != true) return;
             string name = AppCatalog.NameOf(dialog.FileName);
@@ -107,17 +108,17 @@ public partial class SettingsWindow
     /// <summary>"photos", "files and folders", ".psd and .ai files"…: what an action works on, in words.</summary>
     private static string KindPhrase(string kind, string extensions) => kind switch
     {
-        "Everything" => "files and folders",
-        "Chosen types" => string.Join(", ", new CustomAction { Extensions = extensions }.ChosenExtensions()) + " files",
-        _ => kind == "PDFs" ? "PDFs" : kind.ToLowerInvariant(),
+        "Everything" => UiText.T("files and folders"),
+        "Chosen types" => UiText.Format("{0} files", string.Join(", ", new CustomAction { Extensions = extensions }.ChosenExtensions())),
+        _ => UiText.T(kind == "PDFs" ? "PDFs" : kind.ToLowerInvariant()),
     };
 
     /// <summary>"Opens photos in Photoshop", or "Runs a command".</summary>
     private static string Summary(CustomAction action)
     {
-        if (action.Program.Length == 0) return $"Runs a command on {KindPhrase(action.Kind, action.Extensions)}";
+        if (action.Program.Length == 0) return UiText.Format("Runs a command on {0}", KindPhrase(action.Kind, action.Extensions));
         string app = Path.IsPathRooted(action.Program) ? AppCatalog.NameOf(action.Program) : action.Program;
-        return $"Opens {KindPhrase(action.Kind, action.Extensions)} in {app}";
+        return UiText.Format("Opens {0} in {1}", KindPhrase(action.Kind, action.Extensions), app);
     }
 
     /// <summary>Cards narrower than this put Works on and Advanced on a row of their own.</summary>
@@ -140,7 +141,7 @@ public partial class SettingsWindow
             string? why = action.Problem();
             problem.Text = why ?? "";
             problem.Visibility = why is null ? Visibility.Collapsed : Visibility.Visible;
-            runs.Text = why is null ? $"Runs: {Preview(action)}" : "";
+            runs.Text = why is null ? UiText.Format("Runs: {0}", Preview(action)) : "";
             runs.Visibility = why is null ? Visibility.Visible : Visibility.Collapsed;
             summary.Text = Summary(action);
         }
@@ -177,7 +178,7 @@ public partial class SettingsWindow
         summary.TextTrimming = TextTrimming.CharacterEllipsis;
         words.Children.Add(summary);
         if (locked)
-            words.Children.Add(new TextBlock { Text = $"\U0001F451 Needs the upgrade: the first {CustomAction.FreeActions} actions are free", Style = (Style)FindResource("Orbit.Text.Caption"), Margin = new Thickness(2, 3, 0, 0) });
+            words.Children.Add(new TextBlock { Text = UiText.Format("👑 Needs the upgrade: the first {0} actions are free", CustomAction.FreeActions), Style = (Style)FindResource("Orbit.Text.Caption"), Margin = new Thickness(2, 3, 0, 0) });
         top.Children.Add(words);
         panel.Children.Add(top);
         var below = new Border { Margin = new Thickness(46, 10, 0, 0) };
@@ -244,7 +245,7 @@ public partial class SettingsWindow
         var browse = new Button { Content = "Browse…", Style = (Style)FindResource("Orbit.Button.Standard"), Margin = new Thickness(8, 0, 0, 0) };
         browse.Click += (_, _) =>
         {
-            var dialog = new OpenFileDialog { Title = "Choose the program", Filter = "Programs (*.exe;*.bat;*.cmd)|*.exe;*.bat;*.cmd|All files (*.*)|*.*" };
+            var dialog = new OpenFileDialog { Title = UiText.T("Choose the program"), Filter = "Programs (*.exe;*.bat;*.cmd)|*.exe;*.bat;*.cmd|All files (*.*)|*.*" };
             if (dialog.ShowDialog(this) != true) return;
             program.Text = action.Program = dialog.FileName;
             changed();
