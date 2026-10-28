@@ -249,9 +249,16 @@
                         <DockPanel>
                             <TextBlock Style="{StaticResource RowGlyph}" Text="&#xE92E;" />
                             <CheckBox DockPanel.Dock="Right" Style="{StaticResource Orbit.ToggleSwitch}" IsChecked="{Binding KeyboardShortcut}" AutomationProperties.Name="Keyboard shortcut" />
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                                <Button x:Name="WheelShortcutReset" Content="Reset" Style="{StaticResource Orbit.Button.Link}" VerticalAlignment="Center" Margin="0,0,10,0" Click="OnWheelShortcutReset"
+                                        ToolTip="Back to Ctrl + Alt + Space" />
+                                <Button x:Name="WheelShortcutButton" Style="{StaticResource Orbit.Button.Standard}" MinWidth="170" Click="OnWheelShortcutClick" PreviewKeyDown="OnWheelShortcutKey"
+                                        LostKeyboardFocus="OnWheelShortcutLostFocus" ToolTip="Click, then press the keys you want (Esc cancels)" AutomationProperties.Name="Change the keyboard shortcut" />
+                            </StackPanel>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="Ctrl + Alt + Space" Style="{StaticResource RowTitle}" />
-                                <TextBlock Text="{Binding KeyboardShortcutHint}" Style="{StaticResource RowHint}" />
+                                <TextBlock Text="Keyboard shortcut" Style="{StaticResource RowTitle}" />
+                                <TextBlock Text="{Binding KeyboardShortcutHint}" Style="{StaticResource RowHint}" TextWrapping="Wrap" />
+                                <TextBlock x:Name="WheelShortcutProblem" Style="{StaticResource RowHint}" Foreground="{DynamicResource Orbit.Danger}" TextWrapping="Wrap" Visibility="Collapsed" />
                             </StackPanel>
                         </DockPanel>
                     </Border>
@@ -290,7 +297,7 @@
                             <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource Orbit.Text.Body}" Margin="0,4" Text="{Binding CentreReleaseHint}" />
                             <TextBlock Grid.Row="4" Style="{StaticResource Orbit.Text.BodyStrong}" Margin="0,4" Text="Esc" />
                             <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource Orbit.Text.Body}" Margin="0,4" Text="Cancel the drag and close the wheel" />
-                            <TextBlock Grid.Row="5" Style="{StaticResource Orbit.Text.BodyStrong}" Margin="0,4" Text="Ctrl + Alt + Space" />
+                            <TextBlock Grid.Row="5" Style="{StaticResource Orbit.Text.BodyStrong}" Margin="0,4" Text="{Binding WheelShortcutText, Mode=OneWay}" />
                             <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource Orbit.Text.Body}" Margin="0,4" Text="Open the wheel for selected files; click the centre for Tools and Actions" />
                         </Grid>
                     </Border>

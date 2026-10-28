@@ -31,8 +31,10 @@ public sealed class AppSettings
 
     // Shortcuts
     public TriggerKey TriggerKey { get; set; } = TriggerKey.Shift;
-    /// <summary>Ctrl+Alt+Space opens the wheel for the files selected in File Explorer.</summary>
+    /// <summary>A keyboard shortcut (<see cref="WheelShortcut"/>) opens the wheel for the files selected in File Explorer.</summary>
     public bool KeyboardShortcut { get; set; } = true;
+    /// <summary>That shortcut, like "Ctrl+Alt+Space" (see <see cref="KeyCombo"/>).</summary>
+    public string WheelShortcut { get; set; } = KeyCombo.DefaultWheel;
     /// <summary>Letting go of a drag in the wheel's centre keeps the wheel open, to choose with clicks instead of holding.</summary>
     public bool KeepOpenOnCentre { get; set; }
     /// <summary>Ctrl+Alt+Space with nothing selected opens the wheel for what's on the clipboard: copied files or an image.</summary>
@@ -112,6 +114,7 @@ public sealed class AppSettings
         if (!Enum.IsDefined(Theme)) Theme = AppTheme.System;
         if (!Enum.IsDefined(WheelSize)) WheelSize = WheelSize.Standard;
         if (!Enum.IsDefined(TriggerKey)) TriggerKey = TriggerKey.Shift;
+        WheelShortcut = KeyCombo.Normalize(WheelShortcut) ?? KeyCombo.DefaultWheel;
         if (OutputLocation == OutputLocation.Folder && string.IsNullOrWhiteSpace(OutputFolder))
             OutputLocation = OutputLocation.BesideOriginal;
         HiddenOptions = (HiddenOptions ?? []).SelectMany(k => RetiredGroups.TryGetValue(k ?? "", out var members) ? members : [k])

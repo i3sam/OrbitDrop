@@ -311,7 +311,7 @@ public partial class App : Application, ISettingsHost, ITrayCommands
 
         if (before.Theme != _settings.Theme || before.UseWindowsAccent != _settings.UseWindowsAccent || before.ReduceMotion != _settings.ReduceMotion)
             ApplyAppearance();
-        if (before.KeyboardShortcut != _settings.KeyboardShortcut) ApplyHotkey();
+        if (before.KeyboardShortcut != _settings.KeyboardShortcut || before.WheelShortcut != _settings.WheelShortcut) ApplyHotkey();
         if (before.ContextMenu != _settings.ContextMenu) ApplyContextMenu();
         if (before.TriggerKey != _settings.TriggerKey || before.ExtendedDragDetection != _settings.ExtendedDragDetection || before.WorkOnlyInExplorer != _settings.WorkOnlyInExplorer)
         {

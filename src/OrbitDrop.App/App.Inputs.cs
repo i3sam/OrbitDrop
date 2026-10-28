@@ -116,14 +116,19 @@ public partial class App
 
     // ------------------------------------------------------------------ keyboard flow
 
-    /// <summary>Claims (or releases) Ctrl+Alt+Space according to the setting.</summary>
+    /// <summary>The wheel's keyboard shortcut for people: "Ctrl + Alt + Space", or the user's own.</summary>
+    private string ShortcutName => KeyCombo.Display(_settings.WheelShortcut);
+
+    /// <summary>Claims (or releases) the wheel's keyboard shortcut (Ctrl+Alt+Space unless the user picked another).</summary>
     private void ApplyHotkey()
     {
         _hotkey?.Dispose();
         _hotkey = null;
-        if (!_settings.KeyboardShortcut || _messages is null) { Log.Info("Keyboard shortcut Ctrl+Alt+Space off"); return; }
-        _hotkey = new GlobalHotkey(_messages, GlobalHotkey.MOD_CONTROL | GlobalHotkey.MOD_ALT, GlobalHotkey.VK_SPACE, OnHotkey);
-        Log.Info(_hotkey.Registered ? "Keyboard shortcut Ctrl+Alt+Space ready" : "Ctrl+Alt+Space is taken by another app");
+        if (!_settings.KeyboardShortcut || _messages is null) { Log.Info("Keyboard shortcut off"); return; }
+        if (!KeyCombo.TryParse(_settings.WheelShortcut, out uint modifiers, out uint key)) KeyCombo.TryParse(KeyCombo.DefaultWheel, out modifiers, out key);
+        // KeyCombo's modifier bits are RegisterHotKey's own (MOD_ALT 1, MOD_CONTROL 2, MOD_SHIFT 4, MOD_WIN 8).
+        _hotkey = new GlobalHotkey(_messages, modifiers, key, OnHotkey);
+        Log.Info(_hotkey.Registered ? $"Keyboard shortcut {_settings.WheelShortcut} ready" : $"{_settings.WheelShortcut} is taken by another app");
     }
 
     public bool KeyboardShortcutAvailable => _hotkey?.Registered ?? true;
@@ -135,7 +140,7 @@ public partial class App
         if (Paused || _readingSelection) return;
         if (_interaction?.CycleIfOpenFromKeyboard() == true) return; // pressed again: next mode
         IReadOnlyList<string> files = ExplorerSelection.FromForegroundWindow();
-        Log.Info($"Ctrl+Alt+Space: {ExplorerSelection.LastResult}");
+        Log.Info($"Keyboard shortcut: {ExplorerSelection.LastResult}");
         bool vsCode = files.Count == 0 && _messages is not null && VsCodeSelection.IsForeground(out _);
         if (vsCode)
         {
@@ -143,20 +148,20 @@ public partial class App
             try { files = await VsCodeSelection.ReadAsync(_messages!.Handle); }
             catch (Exception ex) { Log.Warn($"Reading the VS Code selection failed: {ex.Message}"); }
             finally { _readingSelection = false; }
-            Log.Info($"Ctrl+Alt+Space in VS Code: {files.Count} item(s)");
+            Log.Info($"Keyboard shortcut in VS Code: {files.Count} item(s)");
         }
         if (files.Count == 0 && !vsCode && _settings.UseClipboard && FromClipboard(ExplorerSelection.LastFolder) is { } clip)
         {
-            Log.Info($"Ctrl+Alt+Space: nothing selected, using the clipboard ({clip.Files.Count} item(s))");
+            Log.Info($"Keyboard shortcut: nothing selected, using the clipboard ({clip.Files.Count} item(s))");
             _interaction?.OpenForSelection(clip.Files, clip.OutputFolder, clip.Label);
             return;
         }
         if (files.Count == 0)
         {
             _toasts.ShowMessage(OrbitDrop.UI.Toasts.ToastKind.Info, "Select files first",
-                vsCode ? "Select files in VS Code's Explorer (or open a file), then press Ctrl+Alt+Space."
-                : _settings.UseClipboard ? "Select files in File Explorer, on the desktop or in VS Code, or copy an image, then press Ctrl+Alt+Space."
-                : "Select files in File Explorer, on the desktop or in VS Code, then press Ctrl+Alt+Space.",
+                vsCode ? $"Select files in VS Code's Explorer (or open a file), then press {ShortcutName}."
+                : _settings.UseClipboard ? $"Select files in File Explorer, on the desktop or in VS Code, or copy an image, then press {ShortcutName}."
+                : $"Select files in File Explorer, on the desktop or in VS Code, then press {ShortcutName}.",
                 ScreenInfo.CursorPosition);
             return;
         }

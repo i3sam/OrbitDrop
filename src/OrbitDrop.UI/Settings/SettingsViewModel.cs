@@ -98,12 +98,16 @@ public sealed class SettingsViewModel : ObservableObject
     public string TriggerName => S.TriggerKey == TriggerKey.Ctrl ? "Ctrl" : "Shift";
     public bool KeyboardShortcut { get => S.KeyboardShortcut; set => Set(s => s.KeyboardShortcut = value, nameof(KeyboardShortcut), nameof(KeyboardShortcutHint), nameof(UseClipboardHint)); }
     public string KeyboardShortcutHint => _host.KeyboardShortcutAvailable
-        ? "Select files in File Explorer, on the desktop or in VS Code, press it, then click an option. Click the centre (or press it again) for Tools and Actions."
-        : "Another app is using this shortcut, so OrbitDrop couldn't claim it.";
+        ? "Select files in File Explorer, on the desktop or in VS Code, press it, then click an option. Click the shortcut to pick your own keys."
+        : "Another app is using this shortcut, so OrbitDrop couldn't claim it. Click it to pick another.";
+    /// <summary>"Ctrl + Alt + Space", or the combination the user picked.</summary>
+    public string WheelShortcutText => KeyCombo.Display(S.WheelShortcut);
+    public bool WheelShortcutIsDefault => S.WheelShortcut == KeyCombo.DefaultWheel;
+    public void SetWheelShortcut(string combo) => Set(s => s.WheelShortcut = combo, nameof(WheelShortcutText), nameof(WheelShortcutIsDefault), nameof(KeyboardShortcutHint), nameof(UseClipboardHint));
     public bool UseClipboard { get => S.UseClipboard; set => Set(s => s.UseClipboard = value, nameof(UseClipboard)); }
     public string UseClipboardHint => S.KeyboardShortcut
-        ? "With nothing selected, Ctrl + Alt + Space opens the wheel for what you copied: files, or an image such as a screenshot. Copied images are saved to the folder you're in, or Pictures."
-        : "Needs Ctrl + Alt + Space (above), which is off.";
+        ? $"With nothing selected, {WheelShortcutText} opens the wheel for what you copied: files, or an image such as a screenshot. Copied images are saved to the folder you're in, or Pictures."
+        : $"Needs {WheelShortcutText} (above), which is off.";
     public bool ContextMenu { get => S.ContextMenu; set => Set(s => s.ContextMenu = value, nameof(ContextMenu)); }
     public string ContextMenuHint => OrbitDrop.Windows.Shell.AppPackage.IsPackaged
         ? "Right-click files or folders in File Explorer and choose OrbitDrop to open the wheel for them."

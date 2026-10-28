@@ -18,6 +18,7 @@ public partial class SettingsWindow : Window
         DataContext = vm;
         Nav.SelectedIndex = 0;
         BuildActions();
+        RefreshWheelShortcut();
         ThemeManager.Current.Changed += OnThemeChanged;
         Closed += (_, _) => ThemeManager.Current.Changed -= OnThemeChanged;
     }
