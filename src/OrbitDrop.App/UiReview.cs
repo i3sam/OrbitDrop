@@ -140,7 +140,7 @@ internal static class UiReview
                 ("success-undo", w => { w.SetResult(ToastKind.Success, "Saved holiday-photo.webp", "In Pictures", true, TimeSpan.Zero); w.SetUndo(true); }),
                 ("undone", w => w.SetResult(ToastKind.Info, "Undone", "Moved to the Recycle Bin", false, TimeSpan.Zero)),
                 ("partial", w => w.SetResult(ToastKind.Warning, "4 saved · 1 failed", "scan.tif: The file isn't a readable image.", true, TimeSpan.Zero)),
-                ("error", w => w.SetResult(ToastKind.Error, "That didn't work", "notes.png: Windows denied access (read-only folder or file in use).", false, TimeSpan.Zero)),
+                ("error", w => { w.SetAction("Report"); w.SetResult(ToastKind.Error, "That didn't work", "notes.png: Windows denied access (read-only folder or file in use).", true, TimeSpan.Zero); }),
                 ("canceled", w => w.SetResult(ToastKind.Info, "Canceled", "3 of 8 finished before you canceled; nothing partial was left behind.", false, TimeSpan.Zero)),
             };
             foreach (var (name, setup) in toastStates)

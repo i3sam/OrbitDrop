@@ -1,4 +1,4 @@
-// POST /api/feedback: a feature request or bug report from orbitdrop.essam.biz/feedback, emailed privately to the
+// POST /api/feedback: a help request, bug report or feature request from orbitdrop.essam.biz/feedback, emailed privately to the
 // developer through Resend (https://resend.com). Nothing is stored here, and nothing is ever shown back to anyone.
 //
 // Settings (Vercel → Project → Settings → Environment Variables; never in this repository):
@@ -12,7 +12,9 @@
 // nothing in a report can run or render), CR/LF removed from the subject, generic error messages.
 
 const ALLOWED_ORIGINS = new Set(["https://orbitdrop.essam.biz", "http://localhost:4321", "http://localhost:8765"]);
-const LIMITS = { title: 120, details: 4000, steps: 3000, email: 200, version: 40, windows: 60, source: 20 };
+const LIMITS = { title: 120, details: 4000, steps: 3000, email: 200, version: 40, windows: 60, source: 20, from: 20 };
+const ABOUT = { purchase: "The upgrade or a purchase", using: "Using OrbitDrop", other: "Something else" };
+const LABELS = { help: "Help request", bug: "Bug report", feature: "Feature request" };
 const PER_ADDRESS = { max: 4, windowMs: 10 * 60_000 };  // 4 reports per address per 10 minutes
 const OVERALL = { max: 40, windowMs: 60 * 60_000 };     // and 40 per hour in total (protects the email quota)
 const MIN_FILL_MS = 2500;                                // humans take longer than this to fill a form
@@ -50,28 +52,32 @@ function limited(key, now) {
 /** Checks a submission; returns the email to send, or an error for the visitor. */
 export function build(body) {
   if (!body || typeof body !== "object") return { error: "Something's missing." };
-  const type = body.type === "bug" ? "bug" : body.type === "feature" ? "feature" : null;
+  const type = Object.hasOwn(LABELS, body.type) ? body.type : null;
   if (!type) return { error: "Something's missing." };
+  const about = type === "help" ? (Object.hasOwn(ABOUT, body.about) ? body.about : "other") : null;
   const f = {
     title: clean(body.title, LIMITS.title), details: clean(body.details, LIMITS.details), steps: clean(body.steps, LIMITS.steps),
     email: clean(body.email, LIMITS.email), version: clean(body.version, LIMITS.version), windows: clean(body.windows, LIMITS.windows),
-    source: clean(body.source, LIMITS.source),
+    source: clean(body.source, LIMITS.source), from: clean(body.from, LIMITS.from).replace(/[^a-z]/g, ""),
   };
   if (f.title.length < 3) return { error: "Please give it a short title." };
   if (f.details.length < 10) return { error: "Please add a few more details." };
+  if (type === "help" && !f.email) return { error: "Please add your email, so we can reply." };
   if (f.email && !validEmail(f.email)) return { error: "That email address doesn't look right." };
 
-  const label = type === "bug" ? "Bug report" : "Feature request";
+  // Purchase problems stand out in the inbox: someone paid and is stuck.
+  const label = about === "purchase" ? "PURCHASE help" : LABELS[type];
   const subject = `[OrbitDrop] ${label}: ${f.title}`.replace(/[\r\n]+/g, " ").slice(0, 160);
   const lines = [
-    `${label}`, "", `Title: ${f.title}`, "",
-    type === "bug" ? "What happened:" : "The idea:", f.details, "",
+    `${label}`, "", ...(about ? [`About: ${ABOUT[about]}`] : []), `Title: ${f.title}`, "",
+    type === "feature" ? "The idea:" : "What happened:", f.details, "",
   ];
-  if (type === "bug") {
-    if (f.steps) lines.push("Steps to make it happen:", f.steps, "");
+  if (type !== "feature") {
+    if (type === "bug" && f.steps) lines.push("Steps to make it happen:", f.steps, "");
     lines.push(`OrbitDrop version: ${f.version || "not given"}`, `Windows: ${f.windows || "not given"}`, `Installed from: ${f.source || "not given"}`, "");
   }
-  lines.push(`Reply to: ${f.email || "no email given"}`, "", "Sent from the form at orbitdrop.essam.biz/feedback.");
+  lines.push(`Reply to: ${f.email || "no email given"}`, "",
+    f.from ? `Sent from the form at orbitdrop.essam.biz/feedback, opened from the app (${f.from}).` : "Sent from the form at orbitdrop.essam.biz/feedback.");
   return { email: { subject, text: lines.join("\n"), replyTo: f.email || undefined } };
 }
 

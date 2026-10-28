@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Feedback · OrbitDrop</title>
-  <meta name="description" content="Request a feature or report a bug in OrbitDrop. It goes straight to the developer, privately.">
+  <meta name="description" content="Get help with OrbitDrop, report a bug or request a feature. It goes straight to the developer, privately, and you get a reply by email.">
   <link rel="canonical" href="https://orbitdrop.essam.biz/feedback">
   <meta property="og:title" content="Feedback · OrbitDrop">
   <meta property="og:url" content="https://orbitdrop.essam.biz/feedback">
@@ -23,7 +23,7 @@
       <nav aria-label="Main">
         <a href="/#features" data-magnetic>Features</a>
         <a href="/updates" data-magnetic>Updates</a>
-        <a href="/feedback" data-magnetic aria-current="page">Feedback</a>
+        <a href="/feedback" data-magnetic aria-current="page">Help</a>
         <a href="https://github.com/i3sam/OrbitDrop" data-magnetic>GitHub</a>
       </nav>
       <a class="nav-cta" href="https://apps.microsoft.com/detail/9NJQRMQLL2SZ?mode=direct&amp;cid=website-feedback" data-magnetic aria-label="Download OrbitDrop from the Microsoft Store"><svg class="cta-logo" viewBox="0 0 23 23" width="16" height="16" aria-hidden="true"><path fill="#F25022" d="M1 1h10v10H1z"/><path fill="#7FBA00" d="M12 1h10v10H12z"/><path fill="#00A4EF" d="M1 12h10v10H1z"/><path fill="#FFB900" d="M12 12h10v10H12z"/></svg><span class="cta-long">Download on Microsoft Store</span><span class="cta-short">Download</span></a>
@@ -32,31 +32,44 @@
 
   <main id="main" class="feedback wrap">
     <header class="updates-hero">
-      <p class="eyebrow">Feedback</p>
-      <h1 class="split">Tell us what to build next.</h1>
-      <p>Most of OrbitDrop's features started as someone's idea, and every bug report gets read. This goes straight to the developer, privately.</p>
+      <p class="eyebrow">Help &amp; feedback</p>
+      <h1 class="split">How can we help?</h1>
+      <p>A question, a problem with a purchase, a bug or an idea: it goes straight to the developer, privately. Leave your email and you'll get a reply.</p>
     </header>
 
     <div class="fb-switch" role="tablist" aria-label="What is it?">
-      <button type="button" role="tab" id="tab-feature" aria-controls="fb-form" aria-selected="true" data-type="feature">Request a feature</button>
+      <button type="button" role="tab" id="tab-help" aria-controls="fb-form" aria-selected="true" data-type="help">Get help</button>
       <button type="button" role="tab" id="tab-bug" aria-controls="fb-form" aria-selected="false" data-type="bug">Report a bug</button>
+      <button type="button" role="tab" id="tab-feature" aria-controls="fb-form" aria-selected="false" data-type="feature">Request a feature</button>
     </div>
 
     <form id="fb-form" class="fb-form" novalidate>
-      <input type="hidden" name="type" value="feature">
+      <input type="hidden" name="type" value="help">
+      <input type="hidden" name="from" value="">
+      <label class="fb-field fb-help">
+        <span>What's it about?</span>
+        <select name="about">
+          <option value="purchase">The upgrade or a purchase</option>
+          <option value="using" selected>Using OrbitDrop</option>
+          <option value="other">Something else</option>
+        </select>
+      </label>
       <label class="fb-field">
-        <span data-for="feature">What would you like OrbitDrop to do?</span>
+        <span data-for="help">What do you need help with, in a few words?</span>
+        <span data-for="feature" hidden>What would you like OrbitDrop to do?</span>
         <span data-for="bug" hidden>What went wrong, in a few words?</span>
         <input name="title" required minlength="3" maxlength="120" autocomplete="off" placeholder="e.g. Convert HEIC to JPG">
       </label>
       <label class="fb-field">
-        <span data-for="feature">Tell us more: what would you use it for?</span>
+        <span data-for="help">Tell us more: what happened, and what were you trying to do?</span>
+        <span data-for="feature" hidden>Tell us more: what would you use it for?</span>
         <span data-for="bug" hidden>What happened, and what did you expect?</span>
+        <small class="fb-pasted" hidden>OrbitDrop copied some details about it for you: paste them in here (Ctrl + V). Remove anything you'd rather not share.</small>
         <textarea name="details" required minlength="10" maxlength="4000" rows="6"></textarea>
         <small class="fb-count" data-count="details">0 / 4000</small>
       </label>
       <div class="fb-bug" hidden>
-        <label class="fb-field">
+        <label class="fb-field" data-for="bug" hidden>
           <span>How can we make it happen? <i>(optional)</i></span>
           <textarea name="steps" maxlength="3000" rows="4" placeholder="1. Drag a PDF from the desktop&#10;2. Tap Shift&#10;3. …"></textarea>
         </label>
@@ -84,7 +97,9 @@
         </div>
       </div>
       <label class="fb-field">
-        <span>Your email <i>(optional, only if you'd like a reply)</i></span>
+        <span data-for="help">Your email <i>(so we can reply)</i></span>
+        <span data-for="bug" hidden>Your email <i>(optional, only if you'd like a reply)</i></span>
+        <span data-for="feature" hidden>Your email <i>(optional, only if you'd like a reply)</i></span>
         <input name="email" type="email" maxlength="200" autocomplete="email" placeholder="you@example.com">
       </label>
       <!-- Left empty by people; filled in by bots. -->
@@ -100,7 +115,7 @@
 
     <div class="fb-done" hidden>
       <h2>Thank you!</h2>
-      <p>It's on its way. If you left your email, you'll hear back.</p>
+      <p>It's on its way. If you left your email, you'll hear back, usually within a day.</p>
       <button class="pill" type="button" id="fb-again">Send another</button>
     </div>
   </main>
@@ -111,6 +126,7 @@
       <nav aria-label="Footer">
         <a href="/">Home</a>
         <a href="/updates">Updates</a>
+        <a href="/feedback">Help</a>
         <a href="/privacy">Privacy</a>
         <a href="https://github.com/i3sam/OrbitDrop">GitHub</a>
       </nav>

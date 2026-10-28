@@ -150,7 +150,7 @@ public partial class App : Application, ISettingsHost, ITrayCommands
         _jobs = new JobQueue(_registry, maxConcurrentJobs: 2);
         var jobs = _jobs;
         _shell = new ShellIntegration(Dispatcher) { FloatHandler = ShowShelf };
-        _toasts = new ToastManager { NotifyOnCompletion = () => _settings.ShowCompletionNotifications };
+        _toasts = new ToastManager { NotifyOnCompletion = () => _settings.ShowCompletionNotifications, ReportProblem = job => OpenSupport("bug", "error", JobDetails(job)) };
 
         _messages = new MessageWindow();
         _systemTheme = new SystemTheme(_messages);

@@ -17,6 +17,9 @@ public sealed class ToastManager
 
     public Func<bool> NotifyOnCompletion { get; set; } = () => true;
 
+    /// <summary>When set, a job that failed completely offers "Report" on its card (set by the app).</summary>
+    public Action<Job>? ReportProblem { get; set; }
+
     /// <param name="recycle">When set, a finished card offers Undo: what the job made goes to the Recycle Bin (see <see cref="Undo"/>).</param>
     public void ShowJob(Job job, Win32.POINT anchor, Action<IReadOnlyList<string>> reveal, Func<IReadOnlyList<string>, int>? recycle = null)
     {
@@ -25,6 +28,12 @@ public sealed class ToastManager
         toast.CancelRequested += job.Cancel;
         toast.ShowRequested += () =>
         {
+            if (ReportProblem is not null && job.IsFinished && Summarize(job).Kind == ToastKind.Error)
+            {
+                ReportProblem(job);
+                toast.FadeOutAndClose();
+                return;
+            }
             var outputs = job.Outcomes.Where(o => o.Output is not null).Select(o => o.Output!).ToList();
             reveal(outputs.Count > 0 ? outputs : job.Files.ToList());
             toast.FadeOutAndClose();
@@ -108,6 +117,11 @@ public sealed class ToastManager
         // (Not when completion cards are turned off: those close at once, and stay out of the way.)
         bool undo = offerUndo && (kind == ToastKind.Warning || (kind == ToastKind.Success && NotifyOnCompletion())) && UndoTargets(job).Count > 0;
         if (undo && close < TimeSpan.FromSeconds(8)) close = TimeSpan.FromSeconds(8);
+        if (kind == ToastKind.Error && ReportProblem is not null)
+        {
+            toast.SetAction("Report");
+            canShow = true;
+        }
         toast.SetResult(kind, title, detail, canShow, close);
         toast.SetUndo(undo);
     }

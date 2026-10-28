@@ -135,6 +135,14 @@ public partial class SettingsWindow : Window
         if (dialog.ShowDialog(this) == true) _vm.ChooseOutputFolder(dialog.FolderName);
     }
 
+    private void OnGetHelp(object sender, RoutedEventArgs e) => _vm.OpenSupport("help", "about");
+
+    private void OnCopyDetails(object sender, RoutedEventArgs e)
+    {
+        try { Clipboard.SetDataObject(_vm.SupportDetails(), copy: true); CopyDetailsButton.Content = "Copied"; }
+        catch (System.Runtime.InteropServices.COMException) { CopyDetailsButton.Content = "Try again"; }
+    }
+
     private void OnReset(object sender, RoutedEventArgs e)
     {
         var answer = MessageBox.Show(this, "Restore all OrbitDrop settings to their defaults?", "Reset settings",

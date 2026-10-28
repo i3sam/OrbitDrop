@@ -56,6 +56,12 @@ The app includes the same guide with a hands-on practice step (tray menu → **H
 
 **Private by design:** everything runs locally. No uploads, no account, no telemetry. The only network request is the update check against GitHub Releases, every few hours. Updates install automatically when you are not using OrbitDrop, after their checksum is verified (Settings → About: turn either off any time).
 
+## Need help?
+
+- **Questions, a problem with a purchase, or something not working:** [orbitdrop.essam.biz/feedback](https://orbitdrop.essam.biz/feedback). It goes straight to the developer, and you get a reply by email. In the app: tray menu → **Help & feedback**, or Settings → About → **Get help**.
+- **Bugs and ideas in public:** [open an issue](https://github.com/i3sam/OrbitDrop/issues).
+- **Bought the upgrade in the Store version, but it shows as locked?** Settings → Upgrade → **Restore purchase**. Make sure the Microsoft Store app is signed in with the account you bought it with.
+
 ## Build from source
 
 Requirements: Windows 10/11 and the [.NET 10 SDK](https://dotnet.microsoft.com/download). For the installer, add [Inno Setup 6](https://jrsoftware.org/isinfo.php) (`winget install JRSoftware.InnoSetup`).

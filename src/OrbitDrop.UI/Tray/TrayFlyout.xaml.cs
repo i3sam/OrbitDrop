@@ -18,6 +18,8 @@ public interface ITrayCommands
     string UpdateMenuText => "Check for updates";
     bool UpdateAvailable => false;
     void UpdateMenuClicked() { }
+    /// <summary>Opens the help form on the website (see the app's OpenSupport).</summary>
+    void OpenSupport(string topic, string from, string? details = null) { }
 }
 
 /// <summary>Notification-area menu in the OrbitDrop design language. Closes when it loses focus or on Esc.</summary>
@@ -88,6 +90,7 @@ public partial class TrayFlyout : Window
     private void OnPause(object sender, RoutedEventArgs e) => Run(() => _commands.Paused = !_commands.Paused);
     private void OnSettings(object sender, RoutedEventArgs e) => Run(() => _commands.OpenSettings());
     private void OnHelp(object sender, RoutedEventArgs e) => Run(_commands.ShowOnboarding);
+    private void OnSupport(object sender, RoutedEventArgs e) => Run(() => _commands.OpenSupport("help", "tray"));
     private void OnUpdate(object sender, RoutedEventArgs e) => Run(_commands.UpdateMenuClicked);
     private void OnAbout(object sender, RoutedEventArgs e) => Run(() => _commands.OpenSettings("About"));
     private void OnExit(object sender, RoutedEventArgs e) => Run(_commands.Quit);

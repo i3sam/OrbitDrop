@@ -33,6 +33,9 @@
                 <Button Style="{StaticResource Orbit.Button.MenuRow}" Click="OnHelp">
                     <DockPanel><TextBlock Style="{StaticResource Orbit.Glyph}" Text="&#xE897;" Width="20" Margin="0,0,12,0" /><TextBlock Text="How to use OrbitDrop" Style="{StaticResource Orbit.Text.Body}" VerticalAlignment="Center" /></DockPanel>
                 </Button>
+                <Button Style="{StaticResource Orbit.Button.MenuRow}" Click="OnSupport">
+                    <DockPanel><TextBlock Style="{StaticResource Orbit.Glyph}" Text="&#xED15;" Width="20" Margin="0,0,12,0" /><TextBlock Text="Help &amp; feedback" Style="{StaticResource Orbit.Text.Body}" VerticalAlignment="Center" /></DockPanel>
+                </Button>
                 <Button Style="{StaticResource Orbit.Button.MenuRow}" Click="OnUpdate">
                     <DockPanel>
                         <TextBlock x:Name="UpdateGlyph" Style="{StaticResource Orbit.Glyph}" Width="20" Margin="0,0,12,0" />

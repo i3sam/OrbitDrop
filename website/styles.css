@@ -478,7 +478,7 @@ html.lenis, html.lenis body { height: auto; }
 .fb-done p { color: var(--ink-2); margin: 0 0 20px; }
 .fb-done .pill { font: inherit; font-weight: 600; cursor: pointer; }
 [hidden] { display: none !important; }
-@media (max-width: 640px) { .fb-form, .fb-done { padding: 24px 18px; } .fb-row { grid-template-columns: 1fr; } .fb-switch button { padding: 10px 14px; font-size: 14px; } }
+@media (max-width: 640px) { .fb-form, .fb-done { padding: 24px 18px; } .fb-row { grid-template-columns: 1fr; } .fb-switch button { padding: 9px 11px; font-size: 13px; white-space: nowrap; } }
 .pill {
   display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 600; font-size: 15px; padding: 13px 24px; border-radius: 999px;
   color: var(--ink); border: 1px solid var(--line); background: var(--card); transition: box-shadow .35s, scale .35s var(--spring), border-color .25s, opacity .2s;

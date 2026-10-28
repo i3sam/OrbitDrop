@@ -40,6 +40,10 @@ public interface ISettingsHost
     void ShowActionsUpgrade() { }
     /// <summary>About › Switch to the Microsoft Store version.</summary>
     void SwitchToStore() { }
+    /// <summary>Opens the help form on the website ("help", "bug"), with OrbitDrop's version filled in.</summary>
+    void OpenSupport(string topic, string from, string? details = null) { }
+    /// <summary>Versions and the last problems in the log, for pasting into a report.</summary>
+    string SupportDetails() => "";
 }
 
 public sealed class SettingsViewModel : ObservableObject
@@ -143,6 +147,8 @@ public sealed class SettingsViewModel : ObservableObject
     public void SetCustomActions(IEnumerable<CustomAction> actions) => _host.Update(s => s.CustomActions = actions.Select(a => a.Clone()).ToArray());
     /// <summary>Adding past the free actions: the upgrade guide, saying so.</summary>
     public void ShowActionsUpgrade() => _host.ShowActionsUpgrade();
+    public void OpenSupport(string topic, string from, string? details = null) => _host.OpenSupport(topic, from, details);
+    public string SupportDetails() => _host.SupportDetails();
     public void SwitchToStore() => _host.SwitchToStore();
     public string SettingsPath => _host.SettingsPath;
     public string LogsPath => _host.LogsPath;

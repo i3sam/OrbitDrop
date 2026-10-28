@@ -485,6 +485,20 @@
                             </StackPanel>
                         </DockPanel>
                     </Border>
+                    <Border Style="{StaticResource Orbit.Card}">
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource RowGlyph}" Text="&#xE897;" />
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button x:Name="CopyDetailsButton" Content="Copy details" Style="{StaticResource Orbit.Button.Standard}" Click="OnCopyDetails" Margin="0,0,8,0"
+                                        ToolTip="Copies OrbitDrop's version and recent problems, to paste into a message" />
+                                <Button Content="Get help" Style="{StaticResource Orbit.Button.Accent}" Click="OnGetHelp" />
+                            </StackPanel>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Get help or report a problem" Style="{StaticResource RowTitle}" />
+                                <TextBlock Text="Something not working, or a question? It goes straight to the developer, and you get a reply by email." Style="{StaticResource RowHint}" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
                     <!-- The GitHub version: move to the Store version in one go (it installs first, then this one goes) -->
                     <Border Style="{StaticResource Orbit.Card}">
                         <DockPanel>

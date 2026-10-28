@@ -68,3 +68,21 @@ test("says so when the email settings are missing", async () => {
   delete process.env.RESEND_API_KEY;
   assert.equal((await call(good, { ip: "203.0.113.10" })).status, 503);
 });
+
+test("help requests need an email, and purchase problems stand out in the subject", () => {
+  const help = { type: "help", about: "purchase", title: "Upgrade not unlocked", details: "I paid but the tools are locked.", from: "license" };
+  assert.match(build(help).error, /email/);
+  const { email } = build({ ...help, email: "buyer@example.com", version: "0.5.4-alpha", source: "Microsoft Store" });
+  assert.match(email.subject, /^\[OrbitDrop\] PURCHASE help: Upgrade not unlocked$/);
+  assert.match(email.text, /About: The upgrade or a purchase/);
+  assert.match(email.text, /OrbitDrop version: 0\.5\.4-alpha/);
+  assert.match(email.text, /opened from the app \(license\)/);
+  assert.equal(email.replyTo, "buyer@example.com");
+});
+
+test("an unknown help topic becomes Something else, and from keeps letters only", () => {
+  const { email } = build({ type: "help", about: "admin", title: "Question", details: "How do I change the shortcut?", email: "a@example.com", from: "tray<script>" });
+  assert.match(email.subject, /Help request/);
+  assert.match(email.text, /About: Something else/);
+  assert.match(email.text, /\(trayscript\)/);
+});
