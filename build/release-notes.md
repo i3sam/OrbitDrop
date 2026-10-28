@@ -1,4 +1,9 @@
-## What's new in 0.4.8-alpha
+## What's new in 0.4.9-alpha
+
+- **Choose your own keyboard shortcut.** Settings › Shortcuts › **Keyboard shortcut**: click the shortcut and press any Ctrl or Alt combination with a letter, number, F-key or Space (like Alt + D or Ctrl + Shift + Space). Then select files, press it, and click what you want: no dragging needed. **Esc** cancels, and **Backspace** or **Reset** brings back Ctrl + Alt + Space.
+- **Taken by another app?** If another program already uses the combination you pick, the row says so, so you can choose another. Every hint and message now names the shortcut you actually use.
+
+## In 0.4.8-alpha
 
 - **Get help from inside OrbitDrop.** Settings › About › **Get help**, or the tray menu › **Help & feedback**, opens a short form that goes straight to the developer, with your OrbitDrop and Windows versions already filled in. Leave your email and you get a reply.
 - **Report a failed conversion in one click.** When something doesn't work, its card now has a **Report** button. It copies what went wrong (the kind of file and the error) to your clipboard, so you can paste it into the form, and nothing is sent without you seeing it.
