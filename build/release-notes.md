@@ -1,4 +1,10 @@
-## What's new in 0.4.7-alpha
+## What's new in 0.4.8-alpha
+
+- **Get help from inside OrbitDrop.** Settings › About › **Get help**, or the tray menu › **Help & feedback**, opens a short form that goes straight to the developer, with your OrbitDrop and Windows versions already filled in. Leave your email and you get a reply.
+- **Report a failed conversion in one click.** When something doesn't work, its card now has a **Report** button. It copies what went wrong (the kind of file and the error) to your clipboard, so you can paste it into the form, and nothing is sent without you seeing it.
+- **Copy details** (Settings › About) copies OrbitDrop's version and the latest problems from its log, ready to paste into any message or GitHub issue.
+
+## In 0.4.7-alpha
 
 - **Fixed: the Your actions cards overlapped in a narrow Settings window.** The action's name no longer runs into the "Works on" box. Names and descriptions now shorten neatly, and Works on and Advanced move onto a row of their own when there isn't room.
 - **Rename an action under Advanced.** The name is now the first row there, which keeps each card clean: app icon, name, what it does.
