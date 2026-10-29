@@ -444,9 +444,11 @@ public sealed class InteractionController : IDropSink, IDisposable
         if (preferred == OperationMode.Convert && s.Mode != OperationMode.Convert) s.UnsupportedNote = $"No conversions for {KindSummary(files)} yet";
         _detector.SessionOpen = true;
         _detector.EnsurePolling();
+        // Open first, then fill: opening starts a new wheel at its normal size, and the fill sizes it for the busiest
+        // page (as a drag does when the files arrive). The other way round, the first page switch made it grow.
+        _wheel.Open(cursor, WheelGeometry.SizeFactor(_settings().WheelSize), animate: true);
         Refresh(animate: false);
         StartEstimates(s);
-        _wheel.Open(cursor, WheelGeometry.SizeFactor(_settings().WheelSize), animate: true);
         _hover.Start();
         Log.Info($"Wheel opened from the keyboard for {files.Count} item(s)");
     }
@@ -490,8 +492,8 @@ public sealed class InteractionController : IDropSink, IDisposable
         _session = new Session { Files = sample, Flat = flat, Items = items, EnterSeen = true, Anchor = ScreenInfo.CursorPosition };
         _detector.SessionOpen = true;
         _detector.EnsurePolling();
-        _wheel.SetContent(OperationMode.Convert, items, "Preview", "Sample options", animate: false);
         _wheel.Open(_session.Anchor, WheelGeometry.SizeFactor(_settings().WheelSize), animate: true);
+        _wheel.SetContent(OperationMode.Convert, items, "Preview", "Sample options", animate: false);
         if (items.Count > 0) { _wheel.SetHighlight(0); _wheel.SetHub(items[0].Label, items[0].DropText.Replace("%1", items[0].DropInsert)); }
         _previewTimer?.Stop();
         _previewTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2.5) };

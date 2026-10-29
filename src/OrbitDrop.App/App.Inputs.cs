@@ -141,6 +141,15 @@ public partial class App
         if (_interaction?.CycleIfOpenFromKeyboard() == true) return; // pressed again: next mode
         IReadOnlyList<string> files = ExplorerSelection.FromForegroundWindow();
         Log.Info($"Keyboard shortcut: {ExplorerSelection.LastResult}");
+        if (files.Count == 0 && ExplorerSelection.LastWasExplorerView && _messages is not null)
+        {
+            // Gallery, Home and other views that aren't a folder keep their selection to themselves: copy it.
+            _readingSelection = true;
+            try { files = await VsCodeSelection.ReadExplorerCopyAsync(_messages.Handle); }
+            catch (Exception ex) { Log.Warn($"Reading the File Explorer selection with Ctrl+C failed: {ex.Message}"); }
+            finally { _readingSelection = false; }
+            Log.Info($"Keyboard shortcut: File Explorer view without a folder (Gallery, Home…), copied {files.Count} item(s)");
+        }
         bool vsCode = files.Count == 0 && _messages is not null && VsCodeSelection.IsForeground(out _);
         if (vsCode)
         {

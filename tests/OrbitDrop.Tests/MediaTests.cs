@@ -13,6 +13,16 @@ public sealed class MediaFactAttribute : FactAttribute
     }
 }
 
+/// <summary><see cref="MediaFactAttribute"/> for theories.</summary>
+public sealed class MediaTheoryAttribute : TheoryAttribute
+{
+    public MediaTheoryAttribute()
+    {
+        if (!File.Exists(Path.Combine(Environment.SystemDirectory, "mfplat.dll")))
+            Skip = "Windows Media Foundation is not installed on this machine.";
+    }
+}
+
 public class MediaRegistryTests
 {
     private static readonly MediaFoundationProvider Provider = new();

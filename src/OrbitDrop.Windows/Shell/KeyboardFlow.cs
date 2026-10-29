@@ -64,12 +64,20 @@ public static class ExplorerSelection
     /// <summary>The folder open in that File Explorer tab (or the desktop), when there was one: where new files belong.</summary>
     public static string? LastFolder { get; private set; }
 
+    /// <summary>
+    /// The foreground was a File Explorer view that isn't a folder on disk (Gallery, Home, This PC…), where Shell
+    /// automation may not see the selection: worth asking with Ctrl+C (<see cref="VsCodeSelection.ReadExplorerCopyAsync"/>).
+    /// </summary>
+    public static bool LastWasExplorerView { get; private set; }
+
     public static IReadOnlyList<string> FromForegroundWindow()
     {
         LastFolder = null;
+        LastWasExplorerView = false;
         IntPtr foreground = GetForegroundWindow();
         string cls = ClassOf(foreground);
         if (cls is not ("Progman" or "WorkerW" or "CabinetWClass")) { LastResult = $"foreground is {cls}, not File Explorer"; return []; }
+        LastWasExplorerView = cls == "CabinetWClass";
 
         // Explorer can briefly refuse automation calls while it's busy (RPC_E_CALL_REJECTED and the like): retry.
         for (int attempt = 1; ; attempt++)
@@ -119,6 +127,7 @@ public static class ExplorerSelection
         if (view is null) { LastResult = "no Explorer view found"; return []; }
 
         try { string? folder = view.Document.Folder.Self.Path; if (!string.IsNullOrEmpty(folder) && Directory.Exists(folder)) LastFolder = folder; } catch { /* a virtual folder (This PC, a ZIP …) */ }
+        if (LastFolder is not null) LastWasExplorerView = false; // a real folder: its selection is complete
         var paths = new List<string>();
         foreach (dynamic item in view.Document.SelectedItems())
         {

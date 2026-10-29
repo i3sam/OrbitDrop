@@ -267,7 +267,14 @@ public sealed class MediaFoundationProvider : IOperationProvider
             && (ex.HResult == unchecked((int)0x80004005) || ex is MediaFormatException { Unexplained: true }))
         {
             bool fileBased = range is not null || profile.Container?.Subtype == "MPEG4";
-            TranscodeAsync(file, temp, profile, fraction, ct, range, duration, hardware: false, fileBased).GetAwaiter().GetResult();
+            try { TranscodeAsync(file, temp, profile, fraction, ct, range, duration, hardware: false, fileBased).GetAwaiter().GetResult(); }
+            catch (Exception retry) when (retry is not OperationCanceledException && VideoFormat.Describe(file) is { } format)
+            {
+                // Windows gives no reason worth showing: say what the video is, so the person (and a bug report) knows.
+                throw new MediaFormatException(format.Unsupported
+                    ? $"This video is stored as {format.Name}, which Windows can't convert."
+                    : $"{Friendly(retry).TrimEnd('.')} (the video is {format.Name}).");
+            }
         }
     }
 
