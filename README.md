@@ -12,11 +12,11 @@
 
 ## Download
 
-<a href="https://apps.microsoft.com/detail/9NJQRMQLL2SZ?mode=direct"><img src="https://get.microsoft.com/images/en-us%20dark.svg" height="52" alt="Get it from Microsoft"></a>&nbsp;&nbsp;<a href="https://github.com/i3sam/OrbitDrop/releases/download/v0.4.9-alpha/OrbitDrop-Setup.exe"><img src="docs/design/download-installer.svg" height="52" alt="Download the installer"></a>
+<a href="https://apps.microsoft.com/detail/9NJQRMQLL2SZ?mode=direct"><img src="https://get.microsoft.com/images/en-us%20dark.svg" height="52" alt="Get it from Microsoft"></a>&nbsp;&nbsp;<a href="https://github.com/i3sam/OrbitDrop/releases/download/v0.6.0-alpha/OrbitDrop-Setup.exe"><img src="docs/design/download-installer.svg" height="52" alt="Download the installer"></a>
 
 **The Microsoft Store is the easiest way:** it's free, installs without a security warning, and keeps OrbitDrop up to date.
 
-<sub>The installer needs no admin rights or .NET. It isn't code-signed yet, so if Windows says "Windows protected your PC", click **More info → Run anyway**. Also available: [portable .zip](https://github.com/i3sam/OrbitDrop/releases/download/v0.4.9-alpha/OrbitDrop-Portable.zip) · [all releases](https://github.com/i3sam/OrbitDrop/releases)<br>Already using the GitHub version? **Settings › About › Switch to the Store version** moves you over, settings included.</sub>
+<sub>The installer needs no admin rights or .NET. It isn't code-signed yet, so if Windows says "Windows protected your PC", click **More info → Run anyway**. Also available: [portable .zip](https://github.com/i3sam/OrbitDrop/releases/download/v0.6.0-alpha/OrbitDrop-Portable.zip) · [all releases](https://github.com/i3sam/OrbitDrop/releases)<br>Already using the GitHub version? **Settings › About › Switch to the Store version** moves you over, settings included.</sub>
 
 ## How it works
 
