@@ -1,4 +1,12 @@
-## What's new in 0.4.9-alpha
+## What's new in 0.6.0-alpha
+
+- **Introducing Dock & Scenes, in the Microsoft Store version.** Press one key and your favourite apps, websites and folders open in a circle at your pointer, or set up your whole PC for gaming, work or study in one click. They're free to try for 3 days in the [Microsoft Store version](https://apps.microsoft.com/detail/9NJQRMQLL2SZ), then part of the OrbitDrop upgrade. This version shows you once, after the update, and keeps working exactly as before.
+- **Compress keeps 60 fps videos sharp.** The 720p, 1080p and 480p presets now give 60 fps clips up to 1.5× the bitrate (1080p60 gets about 8 Mbps instead of 5.4), never more than 80% of the original's own, so small clips don't grow. Found and worked out by teecil in #6, thank you!
+- **Clearer video errors.** A video Windows can't decode (ProRes, Motion JPEG, 10-bit or 4:2:2/4:4:4 H.264) now says what it is, instead of "Windows couldn't read this file".
+- **The keyboard shortcut works in Gallery and Home** in File Explorer: OrbitDrop reads what you selected there, then puts your clipboard back.
+- **A wheel with one option** is now a clean, full ring instead of a thin white line.
+
+## In 0.4.9-alpha
 
 - **Choose your own keyboard shortcut.** Settings › Shortcuts › **Keyboard shortcut**: click the shortcut and press any Ctrl or Alt combination with a letter, number, F-key or Space (like Alt + D or Ctrl + Shift + Space). Then select files, press it, and click what you want: no dragging needed. **Esc** cancels, and **Backspace** or **Reset** brings back Ctrl + Alt + Space.
 - **Taken by another app?** If another program already uses the combination you pick, the row says so, so you can choose another. Every hint and message now names the shortcut you actually use.
