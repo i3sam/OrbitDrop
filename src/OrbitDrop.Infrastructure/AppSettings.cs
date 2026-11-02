@@ -90,6 +90,9 @@ public sealed class AppSettings
     public int SuccessfulJobs { get; set; }
     public bool RatingAsked { get; set; }
 
+    /// <summary>The last version whose "What's new" was shown ("0.6"), so it's shown once per release.</summary>
+    public string WhatsNewSeen { get; set; } = "";
+
     public AppSettings Clone()
     {
         var copy = (AppSettings)MemberwiseClone();

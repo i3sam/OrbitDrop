@@ -151,6 +151,11 @@ internal static class UiReview
                 toast.Close();
             }
 
+            // --- "New in 0.6", once after the update
+            var news = new WhatsNewWindow(() => { });
+            RenderElement((FrameworkElement)news.Content, 620, double.NaN, bg, dir, $"whats-new-{t}", ref count);
+            news.Close();
+
             // --- settings pages
             var host = new PreviewHost(registry);
             foreach (var page in SettingsWindow.PageNames)
