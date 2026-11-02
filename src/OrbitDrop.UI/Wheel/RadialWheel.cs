@@ -307,7 +307,8 @@ public sealed class RadialWheel : Window
         bool on = ReferenceEquals(v, highlighted);
         Color fill = on ? _accent : _segmentColor;
         double opacity = on ? 1 : _segmentOpacity;
-        double rad = v.Angle * Math.PI / 180, lift = on && !ThemeManager.Current.ReduceMotion ? HoverLift : 0;
+        // A lone option is the whole ring: lifting it would just shift the ring.
+        double rad = v.Angle * Math.PI / 180, lift = on && !ThemeManager.Current.ReduceMotion && _visuals.Count > 1 ? HoverLift : 0;
         if (animate && !ThemeManager.Current.ReduceMotion)
         {
             var dur = TimeSpan.FromMilliseconds(90);
@@ -484,6 +485,15 @@ public sealed class RadialWheel : Window
     internal static Geometry Sector(double startDeg, double endDeg, double gap)
     {
         double ro = OuterR - Corner / 2, ri = InnerR + Corner / 2;
+        // One option fills the whole ring. An arc can't start and end at the same point (it collapses into a thin
+        // line), so a full ring is drawn as the space between two circles.
+        if (endDeg - startDeg >= 359.5)
+        {
+            var centre = new Point(Extent / 2, Extent / 2);
+            var ring = new CombinedGeometry(GeometryCombineMode.Exclude, new EllipseGeometry(centre, ro, ro), new EllipseGeometry(centre, ri, ri));
+            ring.Freeze();
+            return ring;
+        }
         double gapOut = gap == 0 ? 0 : (gap / 2 + Corner / 2) / ro * 180 / Math.PI;
         double gapIn = gap == 0 ? 0 : (gap / 2 + Corner / 2) / ri * 180 / Math.PI;
         Point P(double r, double deg) => new(Extent / 2 + r * Math.Cos(deg * Math.PI / 180), Extent / 2 + r * Math.Sin(deg * Math.PI / 180));
