@@ -194,6 +194,7 @@ public partial class App : Application, ISettingsHost, ITrayCommands
             _toasts.ShowMessage(ToastKind.Info, "OrbitDrop is running",
                 $"Drag files and tap {TriggerKeyName}. Find OrbitDrop in the notification area.", ScreenInfo.CursorPosition);
 
+        ShowWhatsNewSoon();
         Log.Info("Ready");
     }
 
