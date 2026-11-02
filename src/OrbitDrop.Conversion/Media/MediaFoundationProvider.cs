@@ -158,7 +158,7 @@ public sealed class MediaFoundationProvider : IOperationProvider
                 var source = await StorageFile.GetFileFromPathAsync(file);
                 var props = await source.Properties.GetVideoPropertiesAsync();
                 var p = MediaEncodingProfile.CreateMp4(props.Width > 0 && props.Height > 0 ? VideoEncodingQuality.HD1080p : VideoEncodingQuality.Auto);
-                await KeepFrameRateAsync(p, source);
+                double fps = await KeepFrameRateAsync(p, source);
                 if (preset.BoxW == 0)
                 {
                     // Same resolution, half the bitrate. Windows may not report a bitrate; estimate it from size Ã· length.
@@ -176,7 +176,7 @@ public sealed class MediaFoundationProvider : IOperationProvider
                     {
                         p.Video.Width = w;
                         p.Video.Height = h;
-                        p.Video.Bitrate = (uint)Math.Clamp(w * h * 2.6, 400_000, 6_000_000); // â2.4 Mbps at 720p, 5.4 at 1080p
+                        p.Video.Bitrate = PresetBitrate(w, h, fps, props.Bitrate); // â2.4 Mbps at 720p, 5.4 at 1080p
                     }
                 }
                 if (p.Audio is not null) p.Audio.Bitrate = 128_000;
@@ -199,15 +199,38 @@ public sealed class MediaFoundationProvider : IOperationProvider
         }
     }
 
-    /// <summary>Copies the source's frame rate into the profile; left as the profile's own when Windows doesn't report one.</summary>
-    private static async Task KeepFrameRateAsync(MediaEncodingProfile profile, StorageFile source)
+    /// <summary>
+    /// Copies the source's frame rate into the profile; left as the profile's own when Windows doesn't report one.
+    /// Returns the frame rate copied, or 0 when it is unknown.
+    /// </summary>
+    private static async Task<double> KeepFrameRateAsync(MediaEncodingProfile profile, StorageFile source)
     {
         var rate = await source.Properties.RetrievePropertiesAsync(["System.Video.FrameRate"]);
         if (rate.TryGetValue("System.Video.FrameRate", out var fr) && fr is uint milli and > 0)
         {
             profile.Video.FrameRate.Numerator = milli; // frames per 1000 seconds
             profile.Video.FrameRate.Denominator = 1000;
+            return milli / 1000.0;
         }
+        return 0;
+    }
+
+    /// <summary>
+    /// Bitrate for a resolution preset: about 2.6 bits per pixel per second (≈2.4 Mbps at 720p, 5.4 at 1080p), and up to
+    /// 1.5× that at 60 fps, which has twice the frames to spend it on. The extra never takes the output above 80% of the
+    /// source's bitrate, so a high-frame-rate video that was already small doesn't grow.
+    /// </summary>
+    public static uint PresetBitrate(uint width, uint height, double fps, uint sourceBitrate)
+    {
+        double bitrate = Math.Clamp(width * (double)height * 2.6, 400_000, 6_000_000);
+        double factor = Math.Clamp(1 + (fps - 30) / 60, 1.0, 1.5);
+        if (factor > 1)
+        {
+            double boosted = Math.Min(bitrate * factor, 9_000_000);
+            if (sourceBitrate > 0) boosted = Math.Min(boosted, Math.Max(bitrate, sourceBitrate * 0.8));
+            bitrate = boosted;
+        }
+        return (uint)bitrate;
     }
 
     /// <summary>Length of a video or audio file, from the Windows property system (zero if unknown).</summary>

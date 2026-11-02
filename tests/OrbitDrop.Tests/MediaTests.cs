@@ -66,6 +66,15 @@ public class MediaRegistryTests
     [InlineData(1281u, 721u, 1278u, 720u)]    // aspect kept, rounded down to even (H.264)
     public void Compress_fits_within_720p_keeping_aspect(uint w, uint h, uint ew, uint eh) =>
         Assert.Equal((ew, eh), MediaFoundationProvider.FitWithin(w, h, 1280, 720));
+
+    [Theory]
+    [InlineData(1920u, 1080u, 30.0, 0u, 5_391_360u)]           // 30 fps: unchanged
+    [InlineData(1920u, 1080u, 0.0, 0u, 5_391_360u)]            // frame rate unknown: unchanged
+    [InlineData(1920u, 1080u, 60.0, 14_600_000u, 8_087_040u)]  // 60 fps: 1.5×
+    [InlineData(1280u, 720u, 60.0, 0u, 3_594_240u)]
+    [InlineData(1920u, 1080u, 60.0, 4_000_000u, 5_391_360u)]   // a small source doesn't get the extra
+    public void Preset_bitrate_rises_with_frame_rate(uint w, uint h, double fps, uint source, uint expected) =>
+        Assert.Equal(expected, MediaFoundationProvider.PresetBitrate(w, h, fps, source));
 }
 
 /// <summary>Real transcodes through Media Foundation on synthetic fixtures; outputs are signature-checked.</summary>
