@@ -3,8 +3,24 @@ using System.Text;
 
 namespace OrbitDrop.Windows.Shell;
 
+/// <summary>A system-wide shortcut, a key combination or a mouse button. Disposing lets it go.</summary>
+public interface IShortcut : IDisposable
+{
+    /// <summary>False when another app already owns the combination.</summary>
+    bool Registered { get; }
+    uint Modifiers { get; }
+    uint Key { get; }
+}
+
+public static class Shortcuts
+{
+    /// <summary>A key combination (RegisterHotKey) or a mouse button (<see cref="MouseShortcut"/>), by its virtual key.</summary>
+    public static IShortcut Claim(MessageWindow window, uint modifiers, uint key, Action pressed) =>
+        key is 0x04 or 0x05 or 0x06 ? new MouseShortcut(modifiers, key, pressed) : new GlobalHotkey(window, modifiers, key, pressed);
+}
+
 /// <summary>A system-wide shortcut registered on the message window (RegisterHotKey). Disposing unregisters it.</summary>
-public sealed class GlobalHotkey : IDisposable
+public sealed class GlobalHotkey : IShortcut
 {
     public const uint MOD_ALT = 0x1, MOD_CONTROL = 0x2, MOD_SHIFT = 0x4, MOD_NOREPEAT = 0x4000;
     public const uint VK_SPACE = 0x20;

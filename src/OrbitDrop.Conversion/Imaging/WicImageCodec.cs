@@ -75,6 +75,12 @@ public static class WicImageCodec
     /// </summary>
     public static BitmapSource Load(string path)
     {
+        try { return LoadCore(path); }
+        catch (Exception ex) when (MissingExtension.For(path, ex) is { } missing) { throw missing; }
+    }
+
+    private static BitmapSource LoadCore(string path)
+    {
         if (Path.GetExtension(path).Equals(".svg", StringComparison.OrdinalIgnoreCase)) return SvgCodec.Load(path);
         using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete);
         BitmapDecoder decoder;

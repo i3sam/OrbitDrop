@@ -43,7 +43,7 @@ public partial class App : Application, ISettingsHost, ITrayCommands
     private UpdateManager? _updates;
     private JobQueue? _jobs;
     private readonly InputBroker _inputs = new();
-    private GlobalHotkey? _hotkey;
+    private IShortcut? _hotkey;
     private SettingsViewModel? _settingsVm;
 
     protected override void OnStartup(StartupEventArgs e)

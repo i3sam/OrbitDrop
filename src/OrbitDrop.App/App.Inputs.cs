@@ -127,7 +127,7 @@ public partial class App
         if (!_settings.KeyboardShortcut || _messages is null) { Log.Info("Keyboard shortcut off"); return; }
         if (!KeyCombo.TryParse(_settings.WheelShortcut, out uint modifiers, out uint key)) KeyCombo.TryParse(KeyCombo.DefaultWheel, out modifiers, out key);
         // KeyCombo's modifier bits are RegisterHotKey's own (MOD_ALT 1, MOD_CONTROL 2, MOD_SHIFT 4, MOD_WIN 8).
-        _hotkey = new GlobalHotkey(_messages, modifiers, key, OnHotkey);
+        _hotkey = Shortcuts.Claim(_messages, modifiers, key, OnHotkey);
         Log.Info(_hotkey.Registered ? $"Keyboard shortcut {_settings.WheelShortcut} ready" : $"{_settings.WheelShortcut} is taken by another app");
     }
 

@@ -7,6 +7,15 @@ namespace OrbitDrop.Conversion.Documents;
 
 public enum DocumentKind { Text, Sheet, Slides, Drawing, Pdf }
 
+/// <summary>Windows couldn't start Word, Excel or PowerPoint to do the conversion (twice).</summary>
+public sealed class OfficeWontStartException(string app, COMException inner)
+    : Exception($"{app} didn't start (Windows error 0x{inner.HResult:X8}). This usually means {app} is waiting on a message: open {app} once, "
+        + $"close anything it shows (sign-in, activation, \"start in safe mode?\"), close {app}, then try again. If you run {app} as "
+        + "administrator, open it normally instead.", inner)
+{
+    public string App { get; } = app;
+}
+
 /// <summary>
 /// The apps that do the actual conversion, found on this PC: Microsoft Word, Excel and PowerPoint (driven through COM,
 /// invisibly, files opened read-only) and LibreOffice (headless, with its own private profile); Office is preferred for
@@ -108,9 +117,7 @@ public sealed class DocumentEngines : IDisposable
             DocumentKind.Slides when PowerPoint.Value => "PowerPoint.Application",
             _ => null,
         };
-        if (office is not null)
-            await StaWorker.RunAsync(() => ConvertWithOffice(office, kind, input, output), "OrbitDrop Office");
-        else if (kind != DocumentKind.Drawing && LibreOffice.Value is { } soffice)
+        async Task WithLibreOffice(string soffice)
         {
             // A profile of its own: works while the user has LibreOffice open, and never touches their settings.
             string profile = new Uri(Path.Combine(Path.GetTempPath(), "OrbitDrop", "libreoffice-profile")).AbsoluteUri;
@@ -118,11 +125,39 @@ public sealed class DocumentEngines : IDisposable
             await RunAsync(soffice, ["--headless", "--norestore", "--nologo", "--nodefault", "--nolockcheck", $"-env:UserInstallation={profile}",
                 .. import, "--convert-to", LibreOfficeFilter(extension), "--outdir", dir, input], ct);
         }
+
+        if (office is not null)
+        {
+            Task WithOffice() => StaWorker.RunAsync(() => ConvertWithOffice(office, kind, input, output), "OrbitDrop Office");
+            try { await WithOffice(); }
+            catch (COMException first) when (WontStart(first))
+            {
+                // Word (or Excel, PowerPoint) didn't start. Often it's only slow the first time (an update, a cold
+                // start), so once more after a moment; then LibreOffice if it's here; then say what usually causes it.
+                await Task.Delay(TimeSpan.FromSeconds(3), ct);
+                try { await WithOffice(); }
+                catch (COMException again) when (WontStart(again))
+                {
+                    if (LibreOffice.Value is { } soffice) await WithLibreOffice(soffice);
+                    else throw new OfficeWontStartException(AppName(office), again);
+                }
+            }
+        }
+        else if (kind != DocumentKind.Drawing && LibreOffice.Value is { } soffice) await WithLibreOffice(soffice);
         else throw new NotSupportedException("No app on this PC can open this file.");
 
         if (!File.Exists(output) || new FileInfo(output).Length == 0) throw new IOException("The conversion didn't produce a file.");
         return output;
     }
+
+    /// <summary>Errors that mean Windows couldn't start the Office app at all (not that the file was bad).</summary>
+    private static bool WontStart(COMException ex) => (uint)ex.HResult is
+        0x80080005 // CO_E_SERVER_EXEC_FAILURE: it started but never answered
+        or 0x800401F3 or 0x80040154 // not registered (a broken or half-removed Office)
+        or 0x80010001 or 0x8001010A // busy: it's showing a message
+        or 0x800706BA or 0x800706BE; // it closed while starting
+
+    private static string AppName(string progId) => progId.Split('.')[0];
 
     private static string LibreOfficeFilter(string extension) => extension switch
     {

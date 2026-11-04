@@ -1,3 +1,4 @@
+using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -43,20 +44,43 @@ public sealed class PrintProvider : IOperationProvider
         bool? printed = null;
         string? problem = null;
         if (pages.Count > 0)
-            await StaWorker.RunAsync(() =>
+        {
+            // The dialog must be shown on the app's own thread: WPF's PrintDialog looks up the app's main window as its
+            // owner, and that throws "The calling thread cannot access this object" from any other thread.
+            Choice? choice = null;
+            void Ask()
             {
                 var dialog = new PrintDialog { UserPageRangeEnabled = pages.Count > 1, MinPage = 1, MaxPage = (uint)pages.Count };
                 printed = dialog.ShowDialog();
                 if (printed != true) return;
                 bool range = dialog.PageRangeSelection == PageRangeSelection.UserPages;
-                try
+                choice = new Choice(dialog.PrintQueue.FullName, Copy(dialog.PrintTicket),
+                    new Size(dialog.PrintableAreaWidth, dialog.PrintableAreaHeight),
+                    range ? dialog.PageRange.PageFrom : 1, range ? dialog.PageRange.PageTo : pages.Count);
+            }
+            try
+            {
+                var ui = Application.Current?.Dispatcher;
+                if (ui is null) await StaWorker.RunAsync(Ask, "OrbitDrop print dialog");
+                else if (ui.CheckAccess()) Ask();
+                else await ui.InvokeAsync(Ask).Task;
+            }
+            catch (Exception ex) { problem = $"Printing didn't work: {ex.Message}"; }
+
+            // The pages are drawn on a thread of their own, so a long PDF doesn't freeze OrbitDrop. A print queue only
+            // works on the thread that opened it, so the printer picked above is opened again here, by name.
+            if (choice is { } c)
+                await StaWorker.RunAsync(() =>
                 {
-                    var paper = new Size(dialog.PrintableAreaWidth, dialog.PrintableAreaHeight);
-                    dialog.PrintDocument(job.Paginator(paper, range ? dialog.PageRange.PageFrom : 1, range ? dialog.PageRange.PageTo : pages.Count),
-                        files.Count == 1 ? Path.GetFileName(files[0]) : $"OrbitDrop: {files.Count} files");
-                }
-                catch (Exception ex) { problem = $"Printing didn't work: {ex.Message}"; }
-            }, "OrbitDrop print");
+                    try
+                    {
+                        using var queue = new PrintQueue(new PrintServer(), c.Printer);
+                        var writer = PrintQueue.CreateXpsDocumentWriter(queue);
+                        writer.Write(job.Paginator(c.Paper, c.From, c.To), c.Ticket);
+                    }
+                    catch (Exception ex) { problem = $"Printing didn't work: {ex.Message}"; }
+                }, "OrbitDrop print");
+        }
 
         foreach (var file in files)
         {
@@ -65,6 +89,19 @@ public sealed class PrintProvider : IOperationProvider
             else if (printed != true) progress.Report(new FileOutcome(file, OutcomeStatus.Canceled, Message: "Printing canceled."));
             else progress.Report(new FileOutcome(file, OutcomeStatus.Succeeded));
         }
+    }
+
+    /// <summary>What the print dialog was told: the printer (by name), its settings, the paper and the pages.</summary>
+    private sealed record Choice(string Printer, PrintTicket Ticket, Size Paper, int From, int To);
+
+    /// <summary>A copy of the print settings that isn't tied to the thread of the dialog that made them.</summary>
+    private static PrintTicket Copy(PrintTicket ticket)
+    {
+        using var xml = ticket.GetXmlStream();
+        var copy = new MemoryStream();
+        xml.CopyTo(copy);
+        copy.Position = 0;
+        return new PrintTicket(copy);
     }
 
     /// <summary>Every page of <paramref name="files"/>, in order: a photo is one, a PDF as many as it has (opened, not drawn yet).</summary>

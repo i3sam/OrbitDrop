@@ -253,7 +253,7 @@
                                 <Button x:Name="WheelShortcutReset" Content="Reset" Style="{StaticResource Orbit.Button.Link}" VerticalAlignment="Center" Margin="0,0,10,0" Click="OnWheelShortcutReset"
                                         ToolTip="Back to Ctrl + Alt + Space" />
                                 <Button x:Name="WheelShortcutButton" Style="{StaticResource Orbit.Button.Standard}" MinWidth="170" Click="OnWheelShortcutClick" PreviewKeyDown="OnWheelShortcutKey"
-                                        LostKeyboardFocus="OnWheelShortcutLostFocus" ToolTip="Click, then press the keys you want (Esc cancels)" AutomationProperties.Name="Change the keyboard shortcut" />
+                                        LostKeyboardFocus="OnWheelShortcutLostFocus" ToolTip="Click, then press the keys you want, or a side button on your mouse (Esc cancels)" AutomationProperties.Name="Change the keyboard shortcut" />
                             </StackPanel>
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="Keyboard shortcut" Style="{StaticResource RowTitle}" />

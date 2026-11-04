@@ -14,7 +14,7 @@ public partial class SettingsWindow
 
     private void RefreshWheelShortcut()
     {
-        WheelShortcutButton.Content = _pickingShortcut ? "Press keys…" : _vm.WheelShortcutText;
+        WheelShortcutButton.Content = _pickingShortcut ? "Press keys or a mouse button…" : _vm.WheelShortcutText;
         WheelShortcutReset.Visibility = _vm.WheelShortcutIsDefault || _pickingShortcut ? Visibility.Collapsed : Visibility.Visible;
     }
 
@@ -24,8 +24,22 @@ public partial class SettingsWindow
         WheelShortcutProblem.Visibility = text is null ? Visibility.Collapsed : Visibility.Visible;
     }
 
+    private bool _mouseHooked;
+
     private void OnWheelShortcutClick(object sender, RoutedEventArgs e)
     {
+        if (!_mouseHooked)
+        {
+            // A mouse's side buttons (or Ctrl/Alt + middle click) can open the wheel too.
+            _mouseHooked = true;
+            WheelShortcutButton.PreviewMouseDown += (_, args) =>
+            {
+                if (!_pickingShortcut || OrbitDrop.UI.Common.ShortcutInput.MouseKey(args.ChangedButton) is not (> 0 and var vk)) return;
+                args.Handled = true;
+                PickWheelShortcut(OrbitDrop.UI.Common.ShortcutInput.HeldModifiers(), vk);
+            };
+            WheelShortcutButton.PreviewMouseUp += (_, args) => { if (OrbitDrop.UI.Common.ShortcutInput.MouseKey(args.ChangedButton) > 0) args.Handled = true; };
+        }
         _pickingShortcut = !_pickingShortcut;
         ShowShortcutProblem(null);
         RefreshWheelShortcut();
@@ -49,11 +63,18 @@ public partial class SettingsWindow
         if (key == Key.Escape) { _pickingShortcut = false; ShowShortcutProblem(null); RefreshWheelShortcut(); return; }
         if (key == Key.Back) { UseWheelShortcut(KeyCombo.DefaultWheel); return; }
         if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt or Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin) return; // wait for the key itself
-        var m = Keyboard.Modifiers;
-        uint modifiers = (m.HasFlag(ModifierKeys.Control) ? KeyCombo.Control : 0) | (m.HasFlag(ModifierKeys.Alt) ? KeyCombo.Alt : 0)
-            | (m.HasFlag(ModifierKeys.Shift) ? KeyCombo.Shift : 0) | (m.HasFlag(ModifierKeys.Windows) ? KeyCombo.Win : 0);
-        string? combo = KeyCombo.Normalize(KeyCombo.Format(modifiers, (uint)KeyInterop.VirtualKeyFromKey(key)));
-        if (combo is null) { ShowShortcutProblem("Hold Ctrl or Alt and press a letter, number, F-key or Space, like Ctrl + Alt + Space."); return; }
+        PickWheelShortcut(OrbitDrop.UI.Common.ShortcutInput.HeldModifiers(), (uint)KeyInterop.VirtualKeyFromKey(key));
+    }
+
+    private void PickWheelShortcut(uint modifiers, uint vk)
+    {
+        string? combo = KeyCombo.Normalize(KeyCombo.Format(modifiers, vk));
+        if (combo is null)
+        {
+            ShowShortcutProblem(vk == KeyCombo.MouseMiddle ? "Hold Ctrl or Alt with the middle button: it's used everywhere on its own."
+                : "Hold Ctrl or Alt and press a letter, number, F-key or Space, like Ctrl + Alt + Space. Or press a side button on your mouse.");
+            return;
+        }
         string? problem = null;
         CheckWheelShortcut(combo, ref problem);
         if (problem is not null) { ShowShortcutProblem(problem); return; }
@@ -65,6 +86,14 @@ public partial class SettingsWindow
         _pickingShortcut = false;
         _vm.SetWheelShortcut(combo);
         ShowShortcutProblem(null);
+        RefreshWheelShortcut();
+    }
+
+    /// <summary>Design-review renders: the picker waiting for keys, or saying why a combination can't be used.</summary>
+    public void PreviewShortcutPicker(bool picking, string? problem = null)
+    {
+        _pickingShortcut = picking;
+        ShowShortcutProblem(problem);
         RefreshWheelShortcut();
     }
 

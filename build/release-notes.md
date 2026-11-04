@@ -1,4 +1,12 @@
-## What's new in 0.6.0-alpha
+## What's new in 0.7.0-alpha
+
+- **Your mouse's side buttons, as shortcuts.** Settings › Shortcuts › **Keyboard shortcut**: click it, then press a side button on your mouse (back or forward) and it opens the wheel for the files you selected. Ctrl or Alt with the middle button works too, and F13 to F24 work on their own. The press belongs to OrbitDrop, so your browser doesn't also go back a page. Thanks for the idea in the feedback form!
+- **Fixed: Print.** Actions › Print said "The calling thread cannot access this object because a different thread owns it" and printed nothing. The print dialog now opens properly, and long PDFs still print without freezing OrbitDrop.
+- **Fixed: Word to PDF when Word won't start.** If Word (or Excel, PowerPoint) doesn't start (error 0x80080005), OrbitDrop tries once more, uses LibreOffice if it's installed, and otherwise tells you what usually causes it (Word waiting on a sign-in or "safe mode" message, or running as administrator) instead of a Windows error code.
+- **AVIF and HEIC photos on Windows 10.** When Windows is missing the free codec these photos need ("No suitable transform was found", 0xC00D5212), OrbitDrop says which one and opens it in the Microsoft Store: click Get, then try again.
+- **New in the [Microsoft Store version](https://apps.microsoft.com/detail/9NJQRMQLL2SZ):** a **Media wheel** (play, pause, skip and volume for whatever's playing, with the song in the middle, from one key), **groups in your Dock** (one slot that opens a wheel of its own, thanks to [pixo2000](https://github.com/pixo2000) in [#7](https://github.com/i3sam/OrbitDrop/issues/7)), and **one key for everything** (the wheel's shortcut opens your Dock when nothing is selected; press it again for Scenes, then Media). Free to try for 3 days, then part of the OrbitDrop upgrade.
+
+## In 0.6.0-alpha
 
 - **Introducing Dock & Scenes, in the Microsoft Store version.** Press one key and your favourite apps, websites and folders open in a circle at your pointer, or set up your whole PC for gaming, work or study in one click. They're free to try for 3 days in the [Microsoft Store version](https://apps.microsoft.com/detail/9NJQRMQLL2SZ), then part of the OrbitDrop upgrade. This version shows you once, after the update, and keeps working exactly as before.
 - **Compress keeps 60 fps videos sharp.** The 720p, 1080p and 480p presets now give 60 fps clips up to 1.5× the bitrate (1080p60 gets about 8 Mbps instead of 5.4), never more than 80% of the original's own, so small clips don't grow. Found and worked out by teecil in #6, thank you!

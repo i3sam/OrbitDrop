@@ -152,7 +152,7 @@ internal static class UiReview
             }
 
             // --- "New in 0.6", once after the update
-            var news = new WhatsNewWindow(() => { });
+            var news = new WhatsNewWindow(() => { }, () => { });
             RenderElement((FrameworkElement)news.Content, 620, double.NaN, bg, dir, $"whats-new-{t}", ref count);
             news.Close();
 
