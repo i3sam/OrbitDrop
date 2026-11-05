@@ -296,7 +296,7 @@ main { padding-top: 76px; }
   box-shadow: 0 8px 32px rgba(0, 0, 0, .06), inset 0 1px 0 rgba(255, 255, 255, .55);
   transition: width .7s var(--ease), background .5s, box-shadow .5s;
 }
-.nav.scrolled .nav-pill { width: min(820px, calc(100% - 24px)); background: color-mix(in srgb, var(--bg) 72%, transparent); box-shadow: 0 14px 44px rgba(0, 0, 0, .12), inset 0 1px 0 rgba(255, 255, 255, .5); }
+.nav.scrolled .nav-pill { width: min(880px, calc(100% - 24px)); background: color-mix(in srgb, var(--bg) 72%, transparent); box-shadow: 0 14px 44px rgba(0, 0, 0, .12), inset 0 1px 0 rgba(255, 255, 255, .5); }
 @media (prefers-color-scheme: dark) {
   .nav-pill { box-shadow: 0 8px 32px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .07); }
   .nav.scrolled .nav-pill { box-shadow: 0 14px 44px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .07); }
@@ -316,8 +316,34 @@ main { padding-top: 76px; }
 .cta-short { display: none; }
 .nav-cta:hover { box-shadow: 0 8px 26px color-mix(in srgb, var(--ink) 34%, transparent); scale: 1.04; }
 /* narrower: shorter label, then the menu links go; the download button is never hidden */
-@media (max-width: 960px) { .cta-long { display: none; } .cta-short { display: inline; } }
-@media (max-width: 720px) { .nav nav { display: none; } .nav-cta { margin-left: auto; } }
+.brand { flex: none; }
+.nav nav { white-space: nowrap; min-width: 0; }
+@media (max-width: 1060px) { .cta-long { display: none; } .cta-short { display: inline; } }
+@media (max-width: 900px) { .nav nav { display: none; } .nav-cta { margin-left: auto; } }
+
+/* phone menu (nav.js): the button, and a sheet that drops from the top */
+.nav-burger { display: none; flex: none; width: 42px; height: 42px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; background: color-mix(in srgb, var(--ink) 7%, transparent); color: var(--ink); position: relative; }
+.nav-burger span { position: absolute; left: 13px; right: 13px; top: 20px; height: 2px; border-radius: 2px; background: currentColor; transition: translate .45s var(--ease), rotate .45s var(--ease); }
+.nav-burger span:first-child { translate: 0 -4px; }
+.nav-burger span:last-child { translate: 0 4px; }
+.nav-burger:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.menu-open .nav-burger span:first-child { translate: 0; rotate: 45deg; }
+.menu-open .nav-burger span:last-child { translate: 0; rotate: -45deg; }
+@media (max-width: 900px) { .nav-pill { gap: 8px; } .nav-burger { display: block; } }
+.menu-sheet {
+  position: fixed; inset: 0; z-index: 55; overflow-y: auto; display: flex; flex-direction: column; gap: 28px;
+  padding: 96px 24px calc(32px + env(safe-area-inset-bottom)); background: var(--bg);
+  clip-path: inset(0 0 100% 0); visibility: hidden; transition: clip-path .6s var(--ease), visibility 0s .6s;
+}
+.menu-open .menu-sheet { clip-path: inset(0); visibility: visible; transition: clip-path .6s var(--ease), visibility 0s; }
+.menu-open, .menu-open body { overflow: hidden; }
+.menu-sheet nav { display: flex; flex-direction: column; }
+.menu-sheet nav a { display: block; padding: 16px 4px; border-bottom: 1px solid var(--line); font-size: clamp(28px, 8vw, 40px); font-weight: 700; letter-spacing: -0.035em; color: var(--ink); text-decoration: none; }
+.menu-sheet nav a[aria-current="page"] { color: var(--ink-2); }
+.menu-sheet a { opacity: 0; translate: 0 -14px; transition: opacity .3s, translate .3s var(--ease); }
+.menu-open .menu-sheet a { opacity: 1; translate: none; transition: opacity .5s calc(.12s + var(--i) * .05s), translate .6s var(--ease) calc(.12s + var(--i) * .05s); }
+.menu-cta { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font-weight: 600; font-size: 16px; text-decoration: none; margin-top: auto; }
+@media (prefers-reduced-motion: reduce) { .menu-sheet, .menu-sheet a, .nav-burger span { transition: none !important; } }
 
 /* ---- custom cursor (mouse only) */
 html.has-cursor, html.has-cursor * { cursor: none !important; }
@@ -350,6 +376,7 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 
 /* ---- the hero plays in on load */
 .hero { position: relative; isolation: isolate; }
+main { overflow-x: clip; }
 .hero-glow {
   position: absolute; z-index: -1; left: 50%; top: 40px; width: 760px; height: 460px; margin-left: -380px; border-radius: 50%; pointer-events: none;
   background: radial-gradient(closest-side, color-mix(in srgb, var(--ink) 9%, transparent), transparent); filter: blur(30px);
