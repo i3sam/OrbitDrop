@@ -62,7 +62,8 @@ export function build(body) {
   };
   if (f.title.length < 3) return { error: "Please give it a short title." };
   if (f.details.length < 10) return { error: "Please add a few more details." };
-  if (type === "help" && !f.email) return { error: "Please add your email, so we can reply." };
+  // Every message needs an email: a complaint or a bug without one can't be answered or followed up.
+  if (!f.email) return { error: "Please add your email, so we can reply." };
   if (f.email && !validEmail(f.email)) return { error: "That email address doesn't look right." };
 
   // Purchase problems stand out in the inbox: someone paid and is stuck.

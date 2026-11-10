@@ -34,7 +34,7 @@
     <header class="updates-hero">
       <p class="eyebrow">Help &amp; feedback</p>
       <h1 class="split">How can we help?</h1>
-      <p>A question, a problem with a purchase, a bug or an idea: it goes straight to the developer, privately. Leave your email and you'll get a reply.</p>
+      <p>A question, a problem with a purchase, a bug or an idea: it goes straight to the developer, privately. Add your email and you'll get a reply.</p>
     </header>
 
     <div class="fb-switch" role="tablist" aria-label="What is it?">
@@ -97,10 +97,8 @@
         </div>
       </div>
       <label class="fb-field">
-        <span data-for="help">Your email <i>(so we can reply)</i></span>
-        <span data-for="bug" hidden>Your email <i>(optional, only if you'd like a reply)</i></span>
-        <span data-for="feature" hidden>Your email <i>(optional, only if you'd like a reply)</i></span>
-        <input name="email" type="email" maxlength="200" autocomplete="email" placeholder="you@example.com">
+        <span>Your email <i>(so we can reply)</i></span>
+        <input name="email" type="email" required maxlength="200" autocomplete="email" placeholder="you@example.com">
       </label>
       <!-- Left empty by people; filled in by bots. -->
       <div class="fb-trap" aria-hidden="true">
@@ -115,7 +113,7 @@
 
     <div class="fb-done" hidden>
       <h2>Thank you!</h2>
-      <p>It's on its way. If you left your email, you'll hear back, usually within a day.</p>
+      <p>It's on its way. You'll hear back by email, usually within a day.</p>
       <button class="pill" type="button" id="fb-again">Send another</button>
     </div>
   </main>

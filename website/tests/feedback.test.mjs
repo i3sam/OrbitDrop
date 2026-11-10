@@ -9,7 +9,15 @@ function call(body, { origin = "https://orbitdrop.essam.biz", method = "POST", t
     handler({ method, headers: { origin, "content-type": type, "x-real-ip": ip }, body }, res);
   });
 }
-const good = { type: "bug", title: "CDR to PNG fails", details: "It says that didn't work every time.", elapsed: 9000, website: "" };
+const good = { type: "bug", title: "CDR to PNG fails", details: "It says that didn't work every time.", email: "someone@example.com", elapsed: 9000, website: "" };
+
+test("every message needs an email, so it can be answered: help, bugs and ideas alike", () => {
+  for (const type of ["help", "bug", "feature"]) {
+    assert.match(build({ ...good, type, email: "" }).error, /email/);
+    assert.match(build({ ...good, type, email: "   " }).error, /email/);
+    assert.ok(build({ ...good, type }).email);
+  }
+});
 
 test("strips control characters and caps length", () => {
   assert.equal(clean("a\u0000b‮c\r\nd", 10), "abc\nd");

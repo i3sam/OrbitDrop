@@ -47,7 +47,7 @@
     const f = form.elements;
     if (f.title.value.trim().length < 3) { status.textContent = "Please give it a short title."; f.title.focus(); return; }
     if (f.details.value.trim().length < 10) { status.textContent = "Please add a few more details."; f.details.focus(); return; }
-    if (f.type.value === "help" && !f.email.value.trim()) { status.textContent = "Please add your email, so we can reply."; f.email.focus(); return; }
+    if (!f.email.value.trim()) { status.textContent = "Please add your email, so we can reply."; f.email.focus(); return; }
     if (f.email.value && !f.email.checkValidity()) { status.textContent = "That email address doesn't look right."; f.email.focus(); return; }
 
     const body = {
