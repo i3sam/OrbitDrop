@@ -605,3 +605,17 @@ html.lenis, html.lenis body { height: auto; }
 .guide-get .badge-link img { display: block; }
 .guide-more { margin-top: 80px; }
 .guide-more h2 { font-size: 26px; margin-bottom: 18px; }
+
+/* Feature pages and the "More than a converter" cards */
+.feature-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.feature-card { padding: 12px 12px 22px; }
+.feature-card img { display: block; width: 100%; height: auto; aspect-ratio: 1232 / 600; object-fit: cover; border-radius: 14px; margin-bottom: 8px; background: #1C1C21; }
+.feature-card > span, .feature-card > b { padding-inline: 10px; }
+.features-home { padding-top: 140px; }
+.features-home h2 { text-align: center; margin-bottom: 10px; font-size: clamp(34px, 5vw, 52px); }
+.features-all { text-align: center; margin: 26px 0 0; color: var(--ink-2); }
+.features-all a { color: var(--ink); font-weight: 600; }
+.up-adds { margin-top: 70px; }
+.up-adds h2 { margin-bottom: 18px; }
+.guide ul { padding-left: 22px; }
+.guide ul li + li { margin-top: 8px; }

@@ -3,6 +3,8 @@
 <h1 align="center">OrbitDrop</h1>
 <p align="center"><b>Your files. Your flow.</b><br>Convert, edit and manage files without opening an app. For Windows 10 (19041+) and 11.</p>
 
+<p align="center"><a href="https://orbitdrop.essam.biz"><b>orbitdrop.essam.biz</b></a> · <a href="https://orbitdrop.essam.biz/features">Features</a> · <a href="https://orbitdrop.essam.biz/guides">Guides</a> · <a href="https://apps.microsoft.com/detail/9NJQRMQLL2SZ?cid=github">Microsoft Store</a></p>
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/guide/guide-hero-dark.gif">
